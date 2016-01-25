@@ -21,8 +21,8 @@ if [[ $TEST_SUITE == "unit" ]]; then
 	go get github.com/stretchr/testify
 	
 	COVERALLS_TOKEN=t47LG6BQsfLwb9WxB56hXUezvwpED6D11
-	TEST_DIRS="main.go load/"
-	VET_DIRS=". ./load/..."
+	TEST_DIRS="main.go cpu/"
+	VET_DIRS=". ./cpu/..."
 
 	set -e
 

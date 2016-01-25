@@ -23,8 +23,9 @@ package main
 
 import (
 	"os"
-	"github.com/intelsdi-x/snap/control/plugin"
+
 	"github.com/intelsdi-x/snap-plugin-collector-cpu/cpu"
+	"github.com/intelsdi-x/snap/control/plugin"
 )
 
 func main() {

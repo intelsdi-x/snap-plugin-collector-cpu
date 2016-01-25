@@ -7,6 +7,18 @@
     "workflow": {
         "collect": {
             "metrics": {
+	"/intel/procfs/cpu/all/user" : {},
+	"/intel/procfs/cpu/all/nice" : {},
+	"/intel/procfs/cpu/all/system" : {},
+	"/intel/procfs/cpu/all/idle" : {},
+	"/intel/procfs/cpu/all/iowait" : {},
+	"/intel/procfs/cpu/all/irq" : {},
+	"/intel/procfs/cpu/all/softirq" : {},
+	"/intel/procfs/cpu/all/steal" : {},
+	"/intel/procfs/cpu/all/guest" : {},
+	"/intel/procfs/cpu/all/guest_nice" : {},
+	"/intel/procfs/cpu/all/active" : {},
+	"/intel/procfs/cpu/all/utilization" : {},
 	"/intel/procfs/cpu/all/user/percentage" : {},
 	"/intel/procfs/cpu/all/nice/percentage" : {},
 	"/intel/procfs/cpu/all/system/percentage" : {},
@@ -18,6 +30,7 @@
 	"/intel/procfs/cpu/all/guest/percentage" : {},
 	"/intel/procfs/cpu/all/guest_nice/percentage" : {},
 	"/intel/procfs/cpu/all/active/percentage" : {},
+	"/intel/procfs/cpu/all/utilization/percentage" : {},
 	"/intel/procfs/cpu/0/user" : {},
 	"/intel/procfs/cpu/0/nice" : {},
 	"/intel/procfs/cpu/0/system" : {},
@@ -29,6 +42,7 @@
 	"/intel/procfs/cpu/0/guest" : {},
 	"/intel/procfs/cpu/0/guest_nice" : {},
 	"/intel/procfs/cpu/0/active" : {},
+	"/intel/procfs/cpu/0/utilization" : {},
 	"/intel/procfs/cpu/0/user/percentage" : {},
 	"/intel/procfs/cpu/0/nice/percentage" : {},
 	"/intel/procfs/cpu/0/system/percentage" : {},
@@ -39,13 +53,8 @@
 	"/intel/procfs/cpu/0/steal/percentage" : {},
 	"/intel/procfs/cpu/0/guest/percentage" : {},
 	"/intel/procfs/cpu/0/guest_nice/percentage" : {},
-	"/intel/procfs/cpu/0/active/percentage" : {}
-            },
-            "config": {
-                "/intel/mock": {
-                    "password": "secret",
-                    "user": "root"
-                }
+	"/intel/procfs/cpu/0/active/percentage" : {},
+	"/intel/procfs/cpu/0/utilization/percentage" : {}
             },
             "process": [
                 {
@@ -55,7 +64,7 @@
                         {
                             "plugin_name": "file",
                             "config": {
-                                "file": "/tmp/published_cpu2.log"
+                                "file": "/tmp/published_cpu.log"
                             }
                         }
                     ],

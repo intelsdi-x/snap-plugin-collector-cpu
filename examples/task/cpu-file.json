@@ -1,0 +1,77 @@
+{
+    "version": 1,
+    "schedule": {
+        "type": "simple",
+        "interval": "1s"
+    },
+    "workflow": {
+        "collect": {
+            "metrics": {
+	"/intel/procfs/cpu/all/user_jiffies" : {},
+	"/intel/procfs/cpu/all/nice_jiffies" : {},
+	"/intel/procfs/cpu/all/system_jiffies" : {},
+	"/intel/procfs/cpu/all/idle_jiffies" : {},
+	"/intel/procfs/cpu/all/iowait_jiffies" : {},
+	"/intel/procfs/cpu/all/irq_jiffies" : {},
+	"/intel/procfs/cpu/all/softirq_jiffies" : {},
+	"/intel/procfs/cpu/all/steal_jiffies" : {},
+	"/intel/procfs/cpu/all/guest_jiffies" : {},
+	"/intel/procfs/cpu/all/guest_nice_jiffies" : {},
+	"/intel/procfs/cpu/all/active_jiffies" : {},
+	"/intel/procfs/cpu/all/utilization_jiffies" : {},
+	"/intel/procfs/cpu/all/user_percentage" : {},
+	"/intel/procfs/cpu/all/nice_percentage" : {},
+	"/intel/procfs/cpu/all/system_percentage" : {},
+	"/intel/procfs/cpu/all/idle_percentage" : {},
+	"/intel/procfs/cpu/all/iowait_percentage" : {},
+	"/intel/procfs/cpu/all/irq_percentage" : {},
+	"/intel/procfs/cpu/all/softirq_percentage" : {},
+	"/intel/procfs/cpu/all/steal_percentage" : {},
+	"/intel/procfs/cpu/all/guest_percentage" : {},
+	"/intel/procfs/cpu/all/guest_nice_percentage" : {},
+	"/intel/procfs/cpu/all/active_percentage" : {},
+	"/intel/procfs/cpu/all/utilization_percentage" : {},
+	"/intel/procfs/cpu/0/user_jiffies" : {},
+	"/intel/procfs/cpu/0/nice_jiffies" : {},
+	"/intel/procfs/cpu/0/system_jiffies" : {},
+	"/intel/procfs/cpu/0/idle_jiffies" : {},
+	"/intel/procfs/cpu/0/iowait_jiffies" : {},
+	"/intel/procfs/cpu/0/irq_jiffies" : {},
+	"/intel/procfs/cpu/0/softirq_jiffies" : {},
+	"/intel/procfs/cpu/0/steal_jiffies" : {},
+	"/intel/procfs/cpu/0/guest_jiffies" : {},
+	"/intel/procfs/cpu/0/guest_nice_jiffies" : {},
+	"/intel/procfs/cpu/0/active_jiffies" : {},
+	"/intel/procfs/cpu/0/utilization_jiffies" : {},
+	"/intel/procfs/cpu/0/user_percentage" : {},
+	"/intel/procfs/cpu/0/nice_percentage" : {},
+	"/intel/procfs/cpu/0/system_percentage" : {},
+	"/intel/procfs/cpu/0/idle_percentage" : {},
+	"/intel/procfs/cpu/0/iowait_percentage" : {},
+	"/intel/procfs/cpu/0/irq_percentage" : {},
+	"/intel/procfs/cpu/0/softirq_percentage" : {},
+	"/intel/procfs/cpu/0/steal_percentage" : {},
+	"/intel/procfs/cpu/0/guest_percentage" : {},
+	"/intel/procfs/cpu/0/guest_nice_percentage" : {},
+	"/intel/procfs/cpu/0/active_percentage" : {},
+	"/intel/procfs/cpu/0/utilization_percentage" : {}
+            },
+            "process": [
+                {
+                    "plugin_name": "passthru",
+                    "process": null,
+                    "publish": [
+                        {
+                            "plugin_name": "file",
+                            "config": {
+                                "file": "/tmp/published_cpu.log"
+                            }
+                        }
+                    ],
+                    "config": null
+                }
+            ],
+            "publish": null
+        }
+    }
+}

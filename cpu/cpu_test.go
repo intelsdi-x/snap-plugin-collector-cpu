@@ -317,153 +317,421 @@ func (cis *CPUInfoSuite) TestgetCPUMetrics() {
 			val, err := getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 23359837)
+			_, ok := val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 6006716)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 1209900)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 402135131)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 129307)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 4)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 2156)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			//cpu0
 			ns = []string{firstCPU, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 3464284)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 998669)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 208226)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 49355234)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 57380)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 3)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 422)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			//cpu1
 			ns = []string{secondCPU, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 3501681)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 1012206)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 189642)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 49374240)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 11620)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 278)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(userProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(niceProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(systemProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(idleProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(irqProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(stealProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(guestProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{allCPU, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(userProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(niceProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(systemProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(idleProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(irqProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(stealProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(guestProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{firstCPU, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(userProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(niceProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(systemProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(idleProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(irqProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(stealProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(guestProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
+			ns = []string{secondCPU, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType)}
+			val, err = getMapValueByNamespace(p.stats, ns)
+			So(err, ShouldBeNil)
+			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			//get new data set from /proc/stat
 			createMockCPUInfo(1)
@@ -475,118 +743,164 @@ func (cis *CPUInfoSuite) TestgetCPUMetrics() {
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 23472679)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 6048986)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 1215282)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 403105970)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 129312)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 4)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 2158)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			//cpu0
 			ns = []string{firstCPU, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 3480506)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 1005574)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 209103)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 49472588)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 57381)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 3)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 424)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			//cpu1
 			ns = []string{secondCPU, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 3516068)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 1019269)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 190413)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
@@ -597,31 +911,43 @@ func (cis *CPUInfoSuite) TestgetCPUMetrics() {
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 11620)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 278)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			//all percentage
 			var prevAllSum, currAllSum float64
@@ -631,51 +957,72 @@ func (cis *CPUInfoSuite) TestgetCPUMetrics() {
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(23472679-23359837)/(currAllSum-prevAllSum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(niceProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(6048986-6006716)/(currAllSum-prevAllSum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(systemProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(1215282-1209900)/(currAllSum-prevAllSum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(idleProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(403105970-402135131)/(currAllSum-prevAllSum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(129312-129307)/(currAllSum-prevAllSum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(irqProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
 
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
+
 			ns = []string{allCPU, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(2158-2156)/(currAllSum-prevAllSum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(stealProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(guestProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{allCPU, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			//cpu0 percentage
 			var prevCPU0Sum, currCPU0Sum float64
@@ -690,46 +1037,64 @@ func (cis *CPUInfoSuite) TestgetCPUMetrics() {
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(1005574-998669)/(currCPU0Sum-prevCPU0Sum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(systemProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(209103-208226)/(currCPU0Sum-prevCPU0Sum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(idleProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(49472588-49355234)/(currCPU0Sum-prevCPU0Sum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(57381-57380)/(currCPU0Sum-prevCPU0Sum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(irqProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(424-422)/(currCPU0Sum-prevCPU0Sum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(stealProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(guestProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{firstCPU, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			//cpu1 percentage
 			var prevCPU1Sum, currCPU1Sum float64
@@ -739,51 +1104,71 @@ func (cis *CPUInfoSuite) TestgetCPUMetrics() {
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(3516068-3501681)/(currCPU1Sum-prevCPU1Sum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(niceProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(1019269-1012206)/(currCPU1Sum-prevCPU1Sum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(systemProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(190413-189642)/(currCPU1Sum-prevCPU1Sum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(idleProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 100*(49493320-49374240)/(currCPU1Sum-prevCPU1Sum))
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(irqProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(stealProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(guestProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			ns = []string{secondCPU, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType)}
 			val, err = getMapValueByNamespace(p.stats, ns)
 			So(err, ShouldBeNil)
 			So(val, ShouldEqual, 0)
+			_, ok = val.(float64)
+			So(ok, ShouldBeTrue)
 
 			Convey("We want to test getStats function with incorrect data sets", func() {
 				createMockCPUInfo(3)

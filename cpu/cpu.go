@@ -47,7 +47,7 @@ const (
 	pluginName = "cpu"
 
 	// version of cpu plugin
-	version = 1
+	version = 2
 
 	//pluginType type of plugin
 	pluginType = plugin.CollectorPluginType
@@ -314,7 +314,8 @@ func getStats(stats map[string]interface{}, prevMetricsSum map[string]float64, c
 				}
 			}
 
-			metricStats[getNamespaceMetricPart(metricName, percentageRepresentationType)] = 0
+			metricStats[getNamespaceMetricPart(metricName, percentageRepresentationType)] = float64(0)
+
 			if mapKeyExists(cpuID, prevMetricsSum) {
 				diffSum := currDataSum - prevMetricsSum[cpuID]
 				if diffSum != 0 {
@@ -324,7 +325,7 @@ func getStats(stats map[string]interface{}, prevMetricsSum map[string]float64, c
 						return err
 					}
 					metricStats[getNamespaceMetricPart(metricName, percentageRepresentationType)] =
-						100 * (currVal - prevVal) / diffSum
+						float64(100 * (currVal - prevVal) / diffSum)
 				}
 			}
 			metricStats[getNamespaceMetricPart(metricName, jiffiesRepresentationType)] = currVal

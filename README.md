@@ -20,7 +20,7 @@ It's used in the [snap framework](http://github.com:intelsdi-x/snap).
 
 ## Getting Started
 ### System Requirements
-* [golang 1.4.3+](https://golang.org/dl/)
+* [golang 1.5+](https://golang.org/dl/)
 
 ### Operating systems
 All OSs currently supported by snap:

@@ -27,7 +27,7 @@ All OSs currently supported by snap:
 * Linux/amd64
 
 ### Installation
-#### Download interface plugin binary:
+#### Download CPU plugin binary:
 You can get the pre-built binaries for your OS and architecture at snap's [GitHub Releases](https://github.com/intelsdi-x/snap/releases) page.
 
 #### To build the plugin binary:
@@ -106,7 +106,7 @@ Namespace | Description (optional)
 /intel/procfs/cpu/\<CPU_number\>/utilization_percentage	| The percent of time spend in non idle and non iowait states by CPU with given identifier
 
 ### Examples
-Example running interface, passthru processor, and writing data to a file.
+Example running CPU collector plugin, passthru processor plugin, and writing data to a file using file publisher plugin.
 
 This is done from the snap directory.
 
@@ -116,7 +116,7 @@ $ $SNAP_PATH/bin/snapd -l 1 -t 0
 ```
 
 In another terminal window:
-Load interface plugin
+Load CPU plugin
 ```
 $ $SNAP_PATH/bin/snapctl plugin load snap-plugin-collector-cpu
 ```

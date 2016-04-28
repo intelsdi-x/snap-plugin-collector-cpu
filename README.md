@@ -8,6 +8,7 @@ It's used in the [snap framework](http://github.com:intelsdi-x/snap).
 
 1. [Getting Started](#getting-started)
   * [System Requirements](#system-requirements)
+  * [Operating systems](#operating-systems)
   * [Installation](#installation)
   * [Configuration and Usage](configuration-and-usage)
 2. [Documentation](#documentation)
@@ -51,7 +52,7 @@ This builds the plugin in `/build/rootfs/`
 ## Documentation
 ### Collected Metrics
 Collected metrics have namespace in following format: `/intel/procfs/cpu/<cpu_identifier>/<metric_name>`.
-List of collected metrics in [METRICS.md](https://github.com/intelsdi-x/snap/blob/master/METRICS.md)
+List of collected metrics in [METRICS.md](https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/METRICS.md)
 
 ### Examples
 Example running CPU collector plugin, passthru processor plugin, and writing data to a file using file publisher plugin.
@@ -75,7 +76,7 @@ See available metrics for your system:
 ```
 $ $SNAP_PATH/bin/snapctl metric list
 ```
-Create a task manifest file (exemplary file in [examples/task/] (https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/examples/task/)):
+Create a task manifest file ( see [exemplary files] (https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/examples/task/)):
     
 ```json
 {

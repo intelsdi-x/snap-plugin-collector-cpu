@@ -34,6 +34,7 @@ import (
 	"github.com/intelsdi-x/snap-plugin-utilities/ns"
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
+	"github.com/intelsdi-x/snap/core"
 )
 
 const (
@@ -115,8 +116,8 @@ var cpuInfo = "/proc/stat"
 
 // GetMetricTypes returns list of available metric types
 // It returns error in case retrieval was not successful
-func (p *Plugin) GetMetricTypes(_ plugin.PluginConfigType) ([]plugin.PluginMetricType, error) {
-	metricTypes := []plugin.PluginMetricType{}
+func (p *Plugin) GetMetricTypes(_ plugin.ConfigType) ([]plugin.MetricType, error) {
+	metricTypes := []plugin.MetricType{}
 	if err := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
 		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
 		return nil, err
@@ -132,8 +133,8 @@ func (p *Plugin) GetMetricTypes(_ plugin.PluginConfigType) ([]plugin.PluginMetri
 
 	for _, namespace := range namespaces {
 		namespace = strings.TrimRight(namespace, string(os.PathSeparator))
-		metricType := plugin.PluginMetricType{
-			Namespace_: strings.Split(namespace, string(os.PathSeparator))}
+		metricType := plugin.MetricType{
+			Namespace_: core.NewNamespace(strings.Split(namespace, string(os.PathSeparator))...)}
 		metricTypes = append(metricTypes, metricType)
 	}
 	return metricTypes, nil
@@ -141,8 +142,8 @@ func (p *Plugin) GetMetricTypes(_ plugin.PluginConfigType) ([]plugin.PluginMetri
 
 // CollectMetrics returns list of requested metric values
 // It returns error in case retrieval was not successful
-func (p *Plugin) CollectMetrics(metricTypes []plugin.PluginMetricType) ([]plugin.PluginMetricType, error) {
-	metrics := []plugin.PluginMetricType{}
+func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.MetricType, error) {
+	metrics := []plugin.MetricType{}
 	if err := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
 		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
 		return nil, err
@@ -154,16 +155,15 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.PluginMetricType) ([]plugin
 			return nil, fmt.Errorf("Incorrect namespace length (len = %d)", len(ns))
 		}
 
-		val, err := getMapValueByNamespace(p.stats, ns[3:])
+		val, err := getMapValueByNamespace(p.stats, ns[3:].Strings())
 
 		if err != nil {
 			return metrics, err
 		}
 
-		metric := plugin.PluginMetricType{
+		metric := plugin.MetricType{
 			Namespace_: ns,
 			Data_:      val,
-			Source_:    p.host,
 			Timestamp_: time.Now(),
 		}
 		metrics = append(metrics, metric)

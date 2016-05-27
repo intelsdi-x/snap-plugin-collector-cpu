@@ -29,6 +29,7 @@ import (
 
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/core"
+	"github.com/intelsdi-x/snap/core/ctypes"
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/stretchr/testify/suite"
 )
@@ -57,6 +58,8 @@ func TestGetStatsSuite(t *testing.T) {
 
 func mockNew() *Plugin {
 	p := New()
+	emptyCfg := make(map[string]ctypes.ConfigValue)
+	p.init(emptyCfg)
 	So(p, ShouldNotBeNil)
 	So(p.snapMetricsNames, ShouldNotBeNil)
 	return p

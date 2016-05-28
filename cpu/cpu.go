@@ -190,12 +190,6 @@ func Meta() *plugin.PluginMeta {
 
 // New creates instance of interface info plugin
 func New() *Plugin {
-	fh, err := os.Open(cpuInfo)
-	if err != nil {
-		return nil
-	}
-	defer fh.Close()
-
 	cpuMetricsNumber, procStatMetricsNumber, err := getInitialProcStatData()
 	if err != nil {
 		return nil

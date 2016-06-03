@@ -35,6 +35,7 @@ import (
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core"
+	"github.com/intelsdi-x/snap/core/ctypes"
 )
 
 const (
@@ -116,12 +117,13 @@ var cpuInfo = "/proc/stat"
 
 // GetMetricTypes returns list of available metric types
 // It returns error in case retrieval was not successful
-func (p *Plugin) GetMetricTypes(_ plugin.ConfigType) ([]plugin.MetricType, error) {
-	metricTypes := []plugin.MetricType{}
-	if err := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
-		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
-		return nil, err
+func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, error) {
+	if !p.initialized {
+		if err := p.init(cfg.Table()); err != nil {
+			return nil, err
+		}
 	}
+	metricTypes := []plugin.MetricType{}
 
 	namespaces := []string{}
 
@@ -144,12 +146,12 @@ func (p *Plugin) GetMetricTypes(_ plugin.ConfigType) ([]plugin.MetricType, error
 // It returns error in case retrieval was not successful
 func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.MetricType, error) {
 	metrics := []plugin.MetricType{}
-	if err := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
-		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
-		return nil, err
-	}
-
 	for _, metricType := range metricTypes {
+		if !p.initialized {
+			if err := p.init(metricType.Config().Table()); err != nil {
+				return nil, err
+			}
+		}
 		ns := metricType.Namespace()
 		if len(ns) != maxNamespaceSize {
 			return nil, fmt.Errorf("Incorrect namespace length (len = %d)", len(ns))
@@ -188,44 +190,55 @@ func Meta() *plugin.PluginMeta {
 		plugin.ConcurrencyCount(1))
 }
 
-// New creates instance of interface info plugin
-func New() *Plugin {
-	fh, err := os.Open(cpuInfo)
+func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
+	path := cpuInfo
+	if procPath, ok := cfg["proc_path"]; ok {
+		path = procPath.(ctypes.ConfigValueStr).Value + "/stat"
+	}
+	fh, err := os.Open(path)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer fh.Close()
 
-	cpuMetricsNumber, procStatMetricsNumber, err := getInitialProcStatData()
+	var procStatMetricsNumber int
+	p.cpuMetricsNumber, procStatMetricsNumber, err = getInitialProcStatData()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	//initialize metric names arrays
-	procStatMetricsNames := []string{userProcStat, niceProcStat, systemProcStat, idleProcStat,
+	p.procStatMetricsNames = []string{userProcStat, niceProcStat, systemProcStat, idleProcStat,
 		iowaitProcStat, irqProcStat, softirqProcStat, stealProcStat, guestProcStat, guestNiceProcStat}
 	snapSpecificMetricsNames := []string{activeProcStat, utilizationProcStat}
 
 	//build snapMetricsNames to support different kernels
-	var snapMetricsNames []string
-	snapMetricsNames = append(snapMetricsNames, procStatMetricsNames[0:procStatMetricsNumber]...)
-	snapMetricsNames = append(snapMetricsNames, snapSpecificMetricsNames...)
+	//var snapMetricsNames []string
+	p.snapMetricsNames = append(p.snapMetricsNames, p.procStatMetricsNames[0:procStatMetricsNumber]...)
+	p.snapMetricsNames = append(p.snapMetricsNames, snapSpecificMetricsNames...)
+	p.stats = make(map[string]interface{})
+	p.prevMetricsSum = make(map[string]float64)
+	if err := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
+		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
+		return err
+	}
+	p.initialized = true
+	return nil
+}
 
+// New creates instance of interface info plugin
+func New() *Plugin {
 	host, err := os.Hostname()
 	if err != nil {
 		host = "localhost"
 	}
-	stats := make(map[string]interface{})
-	prevMetricsSum := make(map[string]float64)
-	p := &Plugin{host: host, cpuMetricsNumber: cpuMetricsNumber, stats: stats,
-		prevMetricsSum: prevMetricsSum, procStatMetricsNames: procStatMetricsNames,
-		snapMetricsNames: snapMetricsNames}
-
+	p := &Plugin{host: host}
 	return p
 }
 
 //Plugin cpu plugin struct which gathers plugin specific data
 type Plugin struct {
+	initialized          bool
 	host                 string
 	cpuMetricsNumber     int // number of cpu + "all" metric
 	stats                map[string]interface{}

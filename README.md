@@ -47,6 +47,41 @@ This builds the plugin in `/build/rootfs/`
 
 ### Configuration and Usage
 * Set up the [snap framework](https://github.com/intelsdi-x/snap/blob/master/README.md#getting-started)
+* If /proc resides in a different directory, say for example by mounting host /proc inside a container at /hostproc, a proc_path configuration item can be added to snapd global config or as part of the task manifest for the metrics to be collected.
+
+As part of snapd global config
+
+```yaml
+---
+control:
+  plugins:
+    collector:
+      cpu:
+        all:
+          proc_path: /hostproc
+```
+
+Or as part of the task manifest
+
+```json
+{
+...
+    "workflow": {
+        "collect": {
+            "metrics": {
+	      "/intel/procfs/cpu/all/user_jiffies" : {}
+	    },
+	    "config": {
+	      "/intel/procfs": {
+                "proc_path": "/hostproc"
+	      }
+	    },
+	    ...
+       },
+    },
+...
+```
+
 * Load the plugin and create a task, see example in [Examples](https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/README.md#examples).
 
 ## Documentation

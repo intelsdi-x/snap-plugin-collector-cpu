@@ -29,10 +29,5 @@ import (
 )
 
 func main() {
-	cpuPlugin := cpu.New()
-	if cpuPlugin == nil {
-		panic("Failed to initialize plugin!\n")
-	}
-	meta := cpu.Meta()
-	plugin.Start(meta, cpuPlugin, os.Args[1])
+	plugin.Start(cpu.Meta(), cpu.New(), os.Args[1])
 }

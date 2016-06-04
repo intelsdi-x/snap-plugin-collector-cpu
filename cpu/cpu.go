@@ -35,7 +35,6 @@ import (
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core"
-	"github.com/intelsdi-x/snap/core/ctypes"
 )
 
 const (
@@ -119,7 +118,7 @@ var cpuInfo = "/proc/stat"
 // It returns error in case retrieval was not successful
 func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, error) {
 	if !p.initialized {
-		if err := p.init(cfg.Table()); err != nil {
+		if err := p.init(); err != nil {
 			return nil, err
 		}
 	}
@@ -148,7 +147,7 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.Metri
 	metrics := []plugin.MetricType{}
 	for _, metricType := range metricTypes {
 		if !p.initialized {
-			if err := p.init(metricType.Config().Table()); err != nil {
+			if err := p.init(); err != nil {
 				return nil, err
 			}
 		}
@@ -190,18 +189,9 @@ func Meta() *plugin.PluginMeta {
 		plugin.ConcurrencyCount(1))
 }
 
-func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
-	path := cpuInfo
-	if procPath, ok := cfg["proc_path"]; ok {
-		path = procPath.(ctypes.ConfigValueStr).Value + "/stat"
-	}
-	fh, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer fh.Close()
-
+func (p *Plugin) init() error {
 	var procStatMetricsNumber int
+	var err error
 	p.cpuMetricsNumber, procStatMetricsNumber, err = getInitialProcStatData()
 	if err != nil {
 		return err

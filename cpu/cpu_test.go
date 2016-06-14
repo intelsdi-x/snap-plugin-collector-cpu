@@ -108,7 +108,8 @@ func (cis *CPUInfoSuite) TestGetMetricTypes() {
 	_ = plugin.ConfigType{}
 	Convey("Given cpu info plugin initialized", cis.T(), func() {
 		p := mockNew()
-		Convey("When one wants to get list of available meterics", func() {
+		So(p, ShouldNotBeNil)
+		Convey("When one wants to get list of available metrics", func() {
 			mts, err := p.GetMetricTypes(plugin.ConfigType{})
 
 			Convey("Then error should not be reported", func() {
@@ -206,9 +207,9 @@ func (cis *CPUInfoSuite) TestGetMetricTypes() {
 }
 
 func (cis *CPUInfoSuite) TestCollectMetrics() {
-	Convey("Given cpu plugin initlialized", cis.T(), func() {
+	Convey("Given cpu plugin initialized", cis.T(), func() {
 		p := mockNew()
-
+		So(p, ShouldNotBeNil)
 		Convey("When one wants to get values for given metric types", func() {
 			mTypes := []plugin.MetricType{
 				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(userProcStat, percentageRepresentationType))},
@@ -292,7 +293,7 @@ func (cis *CPUInfoSuite) TestCollectMetrics() {
 
 			metrics, err := p.CollectMetrics(mTypes)
 
-			Convey("Then no erros should be reported", func() {
+			Convey("Then no errors should be reported", func() {
 				So(err, ShouldBeNil)
 			})
 
@@ -307,13 +308,13 @@ func (cis *CPUInfoSuite) TestCollectMetrics() {
 }
 
 func (cis *CPUInfoSuite) TestgetCPUMetrics() {
-	Convey("Given cpu plugin initlialized", cis.T(), func() {
+	Convey("Given cpu plugin initialized", cis.T(), func() {
 		p := mockNew()
 		So(p, ShouldNotBeNil)
 		Convey("We want to check if metrics have proper value", func() {
 			//get new data set from /proc/stat
 			createMockCPUInfo(0)
-			errStats := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
+			errStats := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
 			So(errStats, ShouldBeNil)
 
 			//all
@@ -739,7 +740,7 @@ func (cis *CPUInfoSuite) TestgetCPUMetrics() {
 
 			//get new data set from /proc/stat
 			createMockCPUInfo(1)
-			errStats = getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
+			errStats = getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
 			So(errStats, ShouldBeNil)
 
 			//all
@@ -1176,41 +1177,44 @@ func (cis *CPUInfoSuite) TestgetCPUMetrics() {
 
 			Convey("We want to test getStats function with incorrect data sets", func() {
 				createMockCPUInfo(3)
-				errStats = getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
+				errStats = getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
 				So(errStats, ShouldNotBeNil)
 
 				createMockCPUInfo(4)
-				errStats = getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
+				errStats = getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
 				So(errStats, ShouldNotBeNil)
 
 				createMockCPUInfo(5)
-				errStats = getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
+				errStats = getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
 				So(errStats, ShouldNotBeNil)
 			})
 		})
 	})
 }
+
 func (cis *CPUInfoSuite) TestgetInitialProcStatData() {
-	Convey("Given cpu plugin initlialized", cis.T(), func() {
+	Convey("Given cpu plugin initialized", cis.T(), func() {
+		p := mockNew()
+		So(p, ShouldNotBeNil)
 		Convey("We want to check initial reading of /proc/stat", func() {
 			createMockCPUInfo(1)
-			_, _, err := getInitialProcStatData()
+			_, _, err := getInitialProcStatData(p.proc_path)
 			So(err, ShouldBeNil)
 			createMockCPUInfo(2)
-			_, _, err = getInitialProcStatData()
+			_, _, err = getInitialProcStatData(p.proc_path)
 			So(err, ShouldBeNil)
 			createMockCPUInfo(3)
-			_, _, err = getInitialProcStatData()
+			_, _, err = getInitialProcStatData(p.proc_path)
 			So(err, ShouldNotBeNil)
 			createMockCPUInfo(4)
-			_, _, err = getInitialProcStatData()
+			_, _, err = getInitialProcStatData(p.proc_path)
 			So(err, ShouldNotBeNil)
 		})
 	})
 }
 
 func (cis *CPUInfoSuite) TestgetMapFloatValueByNamespace() {
-	Convey("Given cpu plugin initlialized", cis.T(), func() {
+	Convey("Given cpu plugin initialized", cis.T(), func() {
 		Convey("We want to check getting float value from nested map", func() {
 			//create map to test
 			subSubMap := make(map[string]interface{})

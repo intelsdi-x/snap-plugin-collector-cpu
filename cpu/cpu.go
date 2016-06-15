@@ -147,12 +147,20 @@ func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, err
 // It returns error in case retrieval was not successful
 func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.MetricType, error) {
 	metrics := []plugin.MetricType{}
-	for _, metricType := range metricTypes {
-		if !p.initialized {
-			if err := p.init(metricType.Config().Table()); err != nil {
-				return nil, err
-			}
+	if len(metricTypes) == 0 {
+		return nil, nil
+	}
+	if !p.initialized {
+		if err := p.init(metricTypes[0].Config().Table()); err != nil {
+			return nil, err
 		}
+	} else {
+		if err := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
+			p.snapMetricsNames, p.procStatMetricsNames); err != nil {
+			return nil, err
+		}
+	}
+	for _, metricType := range metricTypes {
 		ns := metricType.Namespace()
 		if len(ns) != maxNamespaceSize {
 			return nil, fmt.Errorf("Incorrect namespace length (len = %d)", len(ns))

@@ -151,9 +151,6 @@ func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, err
 // It returns error in case retrieval was not successful
 func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.MetricType, error) {
 	metrics := []plugin.MetricType{}
-	if len(metricTypes) == 0 {
-		return nil, nil
-	}
 	if !p.initialized {
 		if err := p.init(metricTypes[0].Config().Table()); err != nil {
 			return nil, err

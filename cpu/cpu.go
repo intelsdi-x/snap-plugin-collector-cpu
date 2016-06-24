@@ -31,11 +31,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/intelsdi-x/snap-plugin-utilities/ns"
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core"
 	"github.com/intelsdi-x/snap/core/ctypes"
+
+	"github.com/intelsdi-x/snap-plugin-utilities/ns"
 )
 
 const (
@@ -176,7 +177,12 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.Metri
 // GetConfigPolicy returns config policy
 // It returns error in case retrieval was not successful
 func (p *Plugin) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
-	return cpolicy.New(), nil
+	cp := cpolicy.New()
+	rule, _ := cpolicy.NewStringRule("proc_path", false, "/proc")
+	node := cpolicy.NewPolicyNode()
+	node.Add(rule)
+	cp.Add([]string{vendor, fs, pluginName}, node)
+	return cp, nil
 }
 
 //Meta returns meta data for plugin

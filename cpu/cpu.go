@@ -191,18 +191,17 @@ func Meta() *plugin.PluginMeta {
 }
 
 func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
-	path := cpuInfo
 	if procPath, ok := cfg["proc_path"]; ok {
-		path = procPath.(ctypes.ConfigValueStr).Value + "/stat"
+		p.proc_path = procPath.(ctypes.ConfigValueStr).Value + "/stat"
 	}
-	fh, err := os.Open(path)
+	fh, err := os.Open(p.proc_path)
 	if err != nil {
 		return err
 	}
 	defer fh.Close()
 
 	var procStatMetricsNumber int
-	p.cpuMetricsNumber, procStatMetricsNumber, err = getInitialProcStatData()
+	p.cpuMetricsNumber, procStatMetricsNumber, err = getInitialProcStatData(p.proc_path)
 	if err != nil {
 		return err
 	}
@@ -218,7 +217,7 @@ func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
 	p.snapMetricsNames = append(p.snapMetricsNames, snapSpecificMetricsNames...)
 	p.stats = make(map[string]interface{})
 	p.prevMetricsSum = make(map[string]float64)
-	if err := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
+	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
 		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
 		return err
 	}
@@ -232,13 +231,17 @@ func New() *Plugin {
 	if err != nil {
 		host = "localhost"
 	}
-	p := &Plugin{host: host}
+	p := &Plugin{
+		host:      host,
+		proc_path: cpuInfo,
+	}
 	return p
 }
 
 //Plugin cpu plugin struct which gathers plugin specific data
 type Plugin struct {
 	initialized          bool
+	proc_path            string
 	host                 string
 	cpuMetricsNumber     int // number of cpu + "all" metric
 	stats                map[string]interface{}
@@ -248,9 +251,9 @@ type Plugin struct {
 }
 
 //getStats gets metrics from /proc/stat output and calculates snap specific metrics
-func getStats(stats map[string]interface{}, prevMetricsSum map[string]float64, cpuMetricsNumber int,
+func getStats(path string, stats map[string]interface{}, prevMetricsSum map[string]float64, cpuMetricsNumber int,
 	snapMetricsNames []string, procStatMetricsNames []string) (err error) {
-	fh, err := os.Open(cpuInfo)
+	fh, err := os.Open(path)
 	if err != nil {
 		return err
 	}
@@ -260,12 +263,12 @@ func getStats(stats map[string]interface{}, prevMetricsSum map[string]float64, c
 	for i := 0; i < cpuMetricsNumber; i++ {
 		scanErr := scanner.Scan()
 		if !scanErr {
-			return fmt.Errorf("Wrong %s format", cpuInfo)
+			return fmt.Errorf("Wrong %s format", path)
 		}
 		fields := strings.Fields(scanner.Text())
 
 		if len(fields) < 2 {
-			return fmt.Errorf("Wrong %s format", cpuInfo)
+			return fmt.Errorf("Wrong %s format", path)
 		}
 
 		cpuID := strings.TrimSpace(fields[0])
@@ -415,8 +418,8 @@ func getMapValueByNamespace(m map[string]interface{}, ns []string) (val interfac
 }
 
 //getInitialProcStatData gets number of CPUs and number of metrics available in /proc/stat output
-func getInitialProcStatData() (cpuMetricsNumber int, procStatMetricNumber int, err error) {
-	fh, err := os.Open(cpuInfo)
+func getInitialProcStatData(path string) (cpuMetricsNumber int, procStatMetricNumber int, err error) {
+	fh, err := os.Open(path)
 	if err != nil {
 		return cpuMetricsNumber, procStatMetricNumber, err
 	}
@@ -426,7 +429,7 @@ func getInitialProcStatData() (cpuMetricsNumber int, procStatMetricNumber int, e
 	//read the first line to start the loop
 	scanErr := scanner.Scan()
 	if scanErr != true {
-		return cpuMetricsNumber, procStatMetricNumber, fmt.Errorf("Cannot read from /proc/stat")
+		return cpuMetricsNumber, procStatMetricNumber, fmt.Errorf("Cannot read from %s", path)
 	}
 
 	procStatLine := strings.Fields(scanner.Text())
@@ -437,7 +440,7 @@ func getInitialProcStatData() (cpuMetricsNumber int, procStatMetricNumber int, e
 		//check line length, compare current length with length of the first line
 		//length of the first line = len(procStatMetricNumber) + CPU identifier
 		if len(procStatLine) != (procStatMetricNumber + 1) {
-			return cpuMetricsNumber, procStatMetricNumber, fmt.Errorf("Incorrect /proc/stat output")
+			return cpuMetricsNumber, procStatMetricNumber, fmt.Errorf("Incorrect %s output", path)
 		}
 		cpuMetricsNumber++
 		//read the next line to be able to check loop condition

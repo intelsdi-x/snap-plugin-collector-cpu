@@ -124,7 +124,7 @@ func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, err
 			return nil, err
 		}
 	}
-	if err := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
+	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
 		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.Metri
 			return nil, err
 		}
 	}
-	if err := getStats(p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
+	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
 		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
 		return nil, err
 	}

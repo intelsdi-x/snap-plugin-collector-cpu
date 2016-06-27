@@ -124,6 +124,10 @@ func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, err
 			return nil, err
 		}
 	}
+	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
+		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
+		return nil, err
+	}
 	metricTypes := []plugin.MetricType{}
 
 	namespaces := []string{}
@@ -147,12 +151,16 @@ func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, err
 // It returns error in case retrieval was not successful
 func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.MetricType, error) {
 	metrics := []plugin.MetricType{}
-	for _, metricType := range metricTypes {
-		if !p.initialized {
-			if err := p.init(metricType.Config().Table()); err != nil {
-				return nil, err
-			}
+	if !p.initialized {
+		if err := p.init(metricTypes[0].Config().Table()); err != nil {
+			return nil, err
 		}
+	}
+	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
+		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
+		return nil, err
+	}
+	for _, metricType := range metricTypes {
 		ns := metricType.Namespace()
 		if len(ns) != maxNamespaceSize {
 			return nil, fmt.Errorf("Incorrect namespace length (len = %d)", len(ns))
@@ -223,10 +231,6 @@ func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
 	p.snapMetricsNames = append(p.snapMetricsNames, snapSpecificMetricsNames...)
 	p.stats = make(map[string]interface{})
 	p.prevMetricsSum = make(map[string]float64)
-	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
-		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
-		return err
-	}
 	p.initialized = true
 	return nil
 }

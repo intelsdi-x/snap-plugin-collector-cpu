@@ -35,8 +35,6 @@ import (
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core"
 	"github.com/intelsdi-x/snap/core/ctypes"
-
-	"github.com/intelsdi-x/snap-plugin-utilities/ns"
 )
 
 const (
@@ -50,7 +48,7 @@ const (
 	pluginName = "cpu"
 
 	// version of cpu plugin
-	version = 2
+	version = 3
 
 	//pluginType type of plugin
 	pluginType = plugin.CollectorPluginType
@@ -113,6 +111,28 @@ const (
 	cpuStr = "cpu"
 )
 
+//Plugin cpu plugin struct which gathers plugin specific data
+
+/* stats - metrics per cpu read from file /proc/stat:
+map ["all": map["user_jiffies": x
+		"user_percentage" x
+		... ]
+     "0": map["user_jiffies": x
+	      "user_percentage" x
+	      ... ]
+     "1": ... ]
+*/
+type Plugin struct {
+	initialized          bool
+	proc_path            string
+	host                 string
+	cpuMetricsNumber     int // number of cpu + "all" metric
+	stats                map[string]map[string]interface{}
+	prevMetricsSum       map[string]float64
+	procStatMetricsNames []string
+	snapMetricsNames     []string
+}
+
 //cpuInfo source of data for metrics
 var cpuInfo = "/proc/stat"
 
@@ -132,10 +152,11 @@ func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, err
 
 	namespaces := []string{}
 
-	err := ns.FromMap(p.stats, filepath.Join(vendor, fs, pluginName), &namespaces)
-
-	if err != nil {
-		return nil, err
+	prefix := filepath.Join(vendor, fs, pluginName)
+	for cpu, stats := range p.stats {
+		for metric, _ := range stats {
+			namespaces = append(namespaces, prefix+"/"+cpu+"/"+metric)
+		}
 	}
 
 	for _, namespace := range namespaces {
@@ -144,6 +165,7 @@ func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, err
 			Namespace_: core.NewNamespace(strings.Split(namespace, string(os.PathSeparator))...)}
 		metricTypes = append(metricTypes, metricType)
 	}
+
 	return metricTypes, nil
 }
 
@@ -166,7 +188,7 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.Metri
 			return nil, fmt.Errorf("Incorrect namespace length (len = %d)", len(ns))
 		}
 
-		val, err := getMapValueByNamespace(p.stats, ns[3:].Strings())
+		val, err := getMapValueByNamespace(p.stats[ns.Strings()[3]], ns.Strings()[4:])
 
 		if err != nil {
 			return metrics, err
@@ -179,6 +201,7 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.Metri
 		}
 		metrics = append(metrics, metric)
 	}
+
 	return metrics, nil
 }
 
@@ -229,7 +252,7 @@ func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
 	//var snapMetricsNames []string
 	p.snapMetricsNames = append(p.snapMetricsNames, p.procStatMetricsNames[0:procStatMetricsNumber]...)
 	p.snapMetricsNames = append(p.snapMetricsNames, snapSpecificMetricsNames...)
-	p.stats = make(map[string]interface{})
+	p.stats = make(map[string]map[string]interface{})
 	p.prevMetricsSum = make(map[string]float64)
 	p.initialized = true
 	return nil
@@ -248,20 +271,8 @@ func New() *Plugin {
 	return p
 }
 
-//Plugin cpu plugin struct which gathers plugin specific data
-type Plugin struct {
-	initialized          bool
-	proc_path            string
-	host                 string
-	cpuMetricsNumber     int // number of cpu + "all" metric
-	stats                map[string]interface{}
-	prevMetricsSum       map[string]float64
-	procStatMetricsNames []string
-	snapMetricsNames     []string
-}
-
 //getStats gets metrics from /proc/stat output and calculates snap specific metrics
-func getStats(path string, stats map[string]interface{}, prevMetricsSum map[string]float64, cpuMetricsNumber int,
+func getStats(path string, stats map[string]map[string]interface{}, prevMetricsSum map[string]float64, cpuMetricsNumber int,
 	snapMetricsNames []string, procStatMetricsNames []string) (err error) {
 	fh, err := os.Open(path)
 	if err != nil {
@@ -340,18 +351,24 @@ func getStats(path string, stats map[string]interface{}, prevMetricsSum map[stri
 				}
 			}
 
-			metricStats[getNamespaceMetricPart(metricName, percentageRepresentationType)] = float64(0)
+			metricStats[getNamespaceMetricPart(metricName, percentageRepresentationType)] = nil
 
 			if mapKeyExists(cpuID, prevMetricsSum) {
 				diffSum := currDataSum - prevMetricsSum[cpuID]
-				if diffSum != 0 {
-					prevVal, err := getMapFloatValueByNamespace(stats,
-						[]string{cpuID, getNamespaceMetricPart(metricName, jiffiesRepresentationType)})
+				if diffSum > 0 {
+					prevVal, err := getMapFloatValueByNamespace(stats[cpuID],
+						[]string{getNamespaceMetricPart(metricName, jiffiesRepresentationType)})
 					if err != nil {
 						return err
 					}
-					metricStats[getNamespaceMetricPart(metricName, percentageRepresentationType)] =
-						float64(100 * (currVal - prevVal) / diffSum)
+
+					if percVal := float64(100 * (currVal - prevVal) / diffSum); percVal < 0 {
+						fmt.Fprintf(os.Stderr, "Percentage value of %v could not be calculated due to invalid data reported by /proc/stat", getNamespaceMetricPart(metricName, percentageRepresentationType))
+					} else {
+						metricStats[getNamespaceMetricPart(metricName, percentageRepresentationType)] = percVal
+					}
+				} else {
+					fmt.Fprintf(os.Stderr, "Percentage value of %v could not be calculated due to invalid data reported by /proc/stat", getNamespaceMetricPart(metricName, percentageRepresentationType))
 				}
 			}
 			metricStats[getNamespaceMetricPart(metricName, jiffiesRepresentationType)] = currVal
@@ -407,8 +424,12 @@ func getMapFloatValueByNamespace(m map[string]interface{}, ns []string) (val flo
 
 //getMapValueByNamespace gets value from map by namespace given in array of strings
 func getMapValueByNamespace(m map[string]interface{}, ns []string) (val interface{}, err error) {
+	if m == nil {
+		return nil, fmt.Errorf("Invalid (nil) value of argument m")
+	}
+
 	if len(ns) == 0 {
-		return val, fmt.Errorf("Namespace length equal to zero")
+		return nil, fmt.Errorf("Namespace length equal to zero")
 	}
 
 	current := ns[0]

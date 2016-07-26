@@ -48,7 +48,7 @@ const (
 	pluginName = "cpu"
 
 	// version of cpu plugin
-	version = 3
+	version = 4
 
 	//pluginType type of plugin
 	pluginType = plugin.CollectorPluginType
@@ -159,11 +159,25 @@ func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, err
 		}
 	}
 
+	// List of terminal metric names
+	mList := make(map[string]bool)
 	for _, namespace := range namespaces {
 		namespace = strings.TrimRight(namespace, string(os.PathSeparator))
 		metricType := plugin.MetricType{
 			Namespace_: core.NewNamespace(strings.Split(namespace, string(os.PathSeparator))...)}
-		metricTypes = append(metricTypes, metricType)
+		ns := metricType.Namespace()
+		// CPU metric (aka last element in namespace)
+		mItem := ns[len(ns)-1]
+		// Keep it if not already seen before
+		if !mList[mItem.Value] {
+			mList[mItem.Value] = true
+			metricTypes = append(metricTypes, plugin.MetricType{
+				Namespace_: core.NewNamespace(strings.Split(prefix, string(os.PathSeparator))...).
+					AddDynamicElement("cpuID", "ID of CPU ('all' for aggregate)").
+					AddStaticElement(mItem.Value),
+				Description_: "dynamic CPU metric: " + mItem.Value,
+			})
+		}
 	}
 
 	return metricTypes, nil
@@ -182,26 +196,43 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.Metri
 		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
 		return nil, err
 	}
+	ts := time.Now()
 	for _, metricType := range metricTypes {
 		ns := metricType.Namespace()
 		if len(ns) != maxNamespaceSize {
 			return nil, fmt.Errorf("Incorrect namespace length (len = %d)", len(ns))
 		}
-
-		val, err := getMapValueByNamespace(p.stats[ns.Strings()[3]], ns.Strings()[4:])
-
-		if err != nil {
-			return metrics, err
+		if ns[len(ns)-2].Value == "*" {
+			for cpuId, cpuStats := range p.stats {
+				for k, v := range cpuStats {
+					if ns[len(ns)-1].Value == k && v != nil {
+						ns1 := make([]core.NamespaceElement, len(ns))
+						copy(ns1, ns)
+						ns1[len(ns)-2].Value = cpuId
+						metric := plugin.MetricType{
+							Namespace_: ns1,
+							Data_:      v,
+							Timestamp_: ts,
+							Version_:   version,
+						}
+						metrics = append(metrics, metric)
+					}
+				}
+			}
+		} else {
+			val, err := getMapValueByNamespace(p.stats[ns.Strings()[3]], ns.Strings()[4:])
+			if err != nil {
+				return metrics, err
+			}
+			metric := plugin.MetricType{
+				Namespace_: ns,
+				Data_:      val,
+				Timestamp_: ts,
+				Version_:   version,
+			}
+			metrics = append(metrics, metric)
 		}
-
-		metric := plugin.MetricType{
-			Namespace_: ns,
-			Data_:      val,
-			Timestamp_: time.Now(),
-		}
-		metrics = append(metrics, metric)
 	}
-
 	return metrics, nil
 }
 

@@ -245,12 +245,12 @@ func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
 
 	//initialize metric names arrays
 	p.procStatMetricsNames = []string{userProcStat, niceProcStat, systemProcStat, idleProcStat,
-		iowaitProcStat, irqProcStat, softirqProcStat, stealProcStat, guestProcStat, guestNiceProcStat}
+		iowaitProcStat, irqProcStat, softirqProcStat, stealProcStat, guestProcStat, guestNiceProcStat}[0:procStatMetricsNumber]
 	snapSpecificMetricsNames := []string{activeProcStat, utilizationProcStat}
 
 	//build snapMetricsNames to support different kernels
 	//var snapMetricsNames []string
-	p.snapMetricsNames = append(p.snapMetricsNames, p.procStatMetricsNames[0:procStatMetricsNumber]...)
+	p.snapMetricsNames = append(p.snapMetricsNames, p.procStatMetricsNames...)
 	p.snapMetricsNames = append(p.snapMetricsNames, snapSpecificMetricsNames...)
 	p.stats = make(map[string]map[string]interface{})
 	p.prevMetricsSum = make(map[string]float64)

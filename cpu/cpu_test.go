@@ -39,6 +39,12 @@ type CPUInfoSuite struct {
 	MockCPUInfo string
 }
 
+const (
+	defaultFormatCpuStatIndex = 0
+	narrowFormatCpuStatIndex  = 7
+	eightColumnCpuStatIndex   = 8
+)
+
 func (cis *CPUInfoSuite) SetupSuite() {
 	cpuInfo = cis.MockCPUInfo
 	loadMockCPUInfo(0)
@@ -96,6 +102,14 @@ func loadMockCPUInfo(dataSetNumber int) {
 			cpu0 3480506 1005574 209103 49472588 57381 3 424 0 0 0
 			cpu1 3516068 1019269 190413 49493320 11620 0 278 0 0 0
 			intr 33594809 19 2 0 0 0 0 0 9 1 4 0 0 4 0 0 0 31 0 0`
+	} else if dataSetNumber == narrowFormatCpuStatIndex {
+		content = `cpu 180401494 227200 18747745 3823269793 1561918 12082 2511349 0 0
+			cpu0 22541572 28113 2329501 477843628 173611 1735 315175 0 0
+			cpu1 23343161 22869 2630545 476714355 160618 1759 329698 0 0`
+	} else if dataSetNumber == eightColumnCpuStatIndex {
+		content = `cpu 180401494 227200 18747745 3823269793 1561918 12082 2511349 0
+			cpu0 22541572 28113 2329501 477843628 173611 1735 315175 0
+			cpu1 23343161 22869 2630545 476714355 160618 1759 329698 0`
 	}
 
 	cpuInfoContent := []byte(content)
@@ -322,7 +336,9 @@ func (cis *CPUInfoSuite) TestgetCPUMetrics() {
 		So(p, ShouldNotBeNil)
 		Convey("We want to check if metrics have proper value", func() {
 			//get new data set from /proc/stat
+
 			loadMockCPUInfo(0)
+
 			errStats := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
 			So(errStats, ShouldBeNil)
 
@@ -1423,6 +1439,163 @@ func (cis *CPUInfoSuite) TestgetMapFloatValueByNamespace() {
 			_, err = getMapFloatValueByNamespace(mainMap, nss)
 			So(err, ShouldNotBeNil)
 
+		})
+	})
+}
+
+func (cis *CPUInfoSuite) TestReadingNarrowFormatStats() {
+	Convey("Given cpu plugin initialized with narrow  /stat format", cis.T(), func() {
+		loadMockCPUInfo(narrowFormatCpuStatIndex)
+		Convey("plugin should be initialized without issues", func() {
+			p := mockNew()
+			So(p, ShouldNotBeNil)
+			Convey("correct values should be collected", func() {
+				errStats := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
+				So(errStats, ShouldBeNil)
+				_ = getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
+				ns := core.NewNamespace(firstCPU, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType))
+				val, err := getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 22541572)
+				_, ok := val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(firstCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 28113)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(firstCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 2329501)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(firstCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 477843628)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(firstCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 173611)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(firstCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 1735)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(firstCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 315175)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(firstCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 0)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(firstCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 0)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+			})
+		})
+		Reset(func() {
+			// reset mock cpu stats to default-width format for other testcases
+			loadMockCPUInfo(defaultFormatCpuStatIndex)
+		})
+	})
+}
+
+func (cis *CPUInfoSuite) TestReadingEightColumnStats() {
+	Convey("Given cpu plugin initialized with 8-column  /stat format", cis.T(), func() {
+		loadMockCPUInfo(eightColumnCpuStatIndex)
+		Convey("plugin should be initialized without issues", func() {
+			p := mockNew()
+			So(p, ShouldNotBeNil)
+			Convey("metrics should be parsed without errors", func() {
+				errStats := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
+				So(errStats, ShouldBeNil)
+			})
+			Convey("correct values should be collected", func() {
+				_ = getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames)
+				ns := core.NewNamespace(secondCPU, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType))
+				val, err := getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 23343161)
+				_, ok := val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(secondCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 22869)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(secondCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 2630545)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(secondCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 476714355)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(secondCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 160618)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(secondCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 1759)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(secondCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 329698)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+
+				ns = core.NewNamespace(secondCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType))
+				val, err = getMapValueByNamespace(p.stats[ns.Strings()[0]], ns.Strings()[1:])
+				So(err, ShouldBeNil)
+				So(val, ShouldEqual, 0)
+				_, ok = val.(float64)
+				So(ok, ShouldBeTrue)
+			})
+		})
+		Reset(func() {
+			// reset mock cpu stats to default-width format for other testcases
+			loadMockCPUInfo(defaultFormatCpuStatIndex)
 		})
 	})
 }

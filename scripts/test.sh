@@ -35,7 +35,7 @@ if [ -z "$TEST_SUITE" ]; then
 	TEST_SUITE=$1
 fi
 # Check validity
-if [ “$TEST_SUITE” != “unit” ]; then
+if [ "$TEST_SUITE" != "unit" ]; then
 	echo "Error; invalid TEST_SUITE (value must be one of 'unit'; received $TEST_SUITE)"
 	exit -1
 fi

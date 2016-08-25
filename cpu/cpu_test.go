@@ -40,6 +40,18 @@ type CPUInfoSuite struct {
 }
 
 const (
+	//firstCPU string indentifier for the first CPU
+	firstCPU = "0"
+
+	//secondCPU string indentifier for the second CPU
+	secondCPU = "1"
+
+	//elevethCPU string indentifier for the eleveth CPU
+	elevethCPU = "10"
+
+	//twelfthCPU string indentifier for the twelfth CPU
+	twelfthCPU = "11"
+
 	defaultFormatCpuStatIndex = 0
 	narrowFormatCpuStatIndex  = 7
 	eightColumnCpuStatIndex   = 8
@@ -77,16 +89,22 @@ func loadMockCPUInfo(dataSetNumber int) {
 		content = `cpu  23359837 6006716 1209900 402135131 129307 4 2156 0 0 0
 			cpu0 3464284 998669 208226 49355234 57380 3 422 0 0 0
 			cpu1 3501681 1012206 189642 49374240 11620 0 278 0 0 0
+			cpu10 3464284 998669 208226 49355234 57380 3 422 0 0 0
+			cpu11 3501681 1012206 189642 49374240 11620 0 278 0 0 0
 			intr 33594809 19 2 0 0 0 0 0 9 1 4 0 0 4 0 0 0 31 0 0`
 	} else if dataSetNumber == 1 {
 		content = `cpu  23472679 6048986 1215282 403105970 129312 4 2158 0 0 0
 			cpu0 3480506 1005574 209103 49472588 57381 3 424 0 0 0
 			cpu1 3516068 1019269 190413 49493320 11620 0 278 0 0 0
+			cpu10 3480506 1005574 209103 49472588 57381 3 424 0 0 0
+			cpu11 3516068 1019269 190413 49493320 11620 0 278 0 0 0
 			intr 33594809 19 2 0 0 0 0 0 9 1 4 0 0 4 0 0 0 31 0 0`
 	} else if dataSetNumber == 2 {
 		content = `cpu  23472670 6049996 1215282 403105970 129312 4 2158 0 0 0
 			cpu0 3480508 1005570 209105 49472590 57390 3 430 0 0 0
-			cpu1 3516060 1019260 190410 49493310 11610 0 270 0 0 0`
+			cpu1 3516060 1019260 190410 49493310 11610 0 270 0 0 0
+			cpu10 3480508 1005570 209105 49472590 57390 3 430 0 0 0
+			cpu11 3516060 1019260 190410 49493310 11610 0 270 0 0 0`
 	} else if dataSetNumber == 3 {
 		content = `cpu  23472679 6048986 1215282 403105970 129312 4 2158 0 0 0
 			cpu0 3480506 1005574 209103 49472588 57381 3 424 0 0 0
@@ -180,85 +198,41 @@ func (cis *CPUInfoSuite) TestCollectMetrics() {
 	Convey("Given cpu plugin initialized", cis.T(), func() {
 		p := mockNew()
 		So(p, ShouldNotBeNil)
+
 		Convey("When one wants to get values for given metric types", func() {
-			mTypes := []plugin.MetricType{
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(userProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(niceProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(systemProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(idleProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(irqProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(stealProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(guestProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(activeProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(utilizationProcStat, percentageRepresentationType))},
+			cpuIDs := []string{allCPU, firstCPU, secondCPU, elevethCPU, twelfthCPU} //slice of CPU identifiers which are used in be used n namespaces
 
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(activeProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, allCPU, getNamespaceMetricPart(utilizationProcStat, jiffiesRepresentationType))},
+			mTypes := []plugin.MetricType{}
 
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(userProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(niceProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(systemProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(idleProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(irqProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(stealProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(guestProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(activeProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(utilizationProcStat, percentageRepresentationType))},
+			for _, cpuID := range cpuIDs {
+				mts := []plugin.MetricType{
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(userProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(niceProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(systemProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(idleProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(irqProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(stealProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(guestProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(activeProcStat, percentageRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(utilizationProcStat, percentageRepresentationType))},
 
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(activeProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(utilizationProcStat, jiffiesRepresentationType))},
-
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(userProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(niceProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(systemProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(idleProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(iowaitProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(irqProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(softirqProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(stealProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(guestProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(guestNiceProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(activeProcStat, percentageRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, secondCPU, getNamespaceMetricPart(utilizationProcStat, percentageRepresentationType))},
-
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(activeProcStat, jiffiesRepresentationType))},
-				plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, firstCPU, getNamespaceMetricPart(utilizationProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(userProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(niceProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(systemProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(idleProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(iowaitProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(irqProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(softirqProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(stealProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(guestProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(guestNiceProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(activeProcStat, jiffiesRepresentationType))},
+					plugin.MetricType{Namespace_: core.NewNamespace(vendor, fs, pluginName, cpuID, getNamespaceMetricPart(utilizationProcStat, jiffiesRepresentationType))},
+				}
+				mTypes = append(mTypes, mts...)
 			}
 
 			metrics, err := p.CollectMetrics(mTypes)
@@ -269,6 +243,9 @@ func (cis *CPUInfoSuite) TestCollectMetrics() {
 
 			Convey("Then proper metrics values are returned", func() {
 				So(len(metrics), ShouldEqual, len(mTypes))
+
+				namespaces := []string{} //slice of namespaces for collected metrics
+
 				for _, mt := range metrics {
 					// Only jiffies metrics should not be nil
 					for _, ns := range mt.Namespace_ {
@@ -276,7 +253,40 @@ func (cis *CPUInfoSuite) TestCollectMetrics() {
 							So(mt.Data_, ShouldNotBeNil)
 						}
 					}
+					//add namespace to slice of namespaces
+					namespaces = append(namespaces, mt.Namespace().String())
 				}
+
+				Convey("Then collected metrics have desired namespaces", func() {
+
+					for _, cpuID := range cpuIDs {
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/user_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/nice_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/system_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/idle_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/iowait_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/irq_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/softirq_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/steal_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/guest_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/guest_nice_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/active_jiffies")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/utilization_jiffies")
+
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/user_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/nice_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/system_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/idle_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/iowait_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/irq_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/softirq_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/steal_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/guest_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/guest_nice_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/active_percentage")
+						So(namespaces, ShouldContain, "/intel/procfs/cpu/"+cpuID+"/utilization_percentage")
+					}
+				})
 			})
 		})
 	})

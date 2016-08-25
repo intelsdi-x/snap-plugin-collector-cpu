@@ -10,7 +10,7 @@ It's used in the [snap framework](http://github.com:intelsdi-x/snap).
   * [System Requirements](#system-requirements)
   * [Operating systems](#operating-systems)
   * [Installation](#installation)
-  * [Configuration and Usage](configuration-and-usage)
+  * [Configuration and Usage](#configuration-and-usage)
 2. [Documentation](#documentation)
   * [Collected Metrics](#collected-metrics)
   * [Examples](#examples)
@@ -32,7 +32,7 @@ All OSs currently supported by plugin:
 You can get the pre-built binaries for your OS and architecture at snap's [GitHub Releases](https://github.com/intelsdi-x/snap/releases) page. Download the plugins package from the latest release, unzip and store in a path you want `snapd` to access.
 
 ### To build the plugin binary:
-Fork https://github.com/intelsdi-x/snap-plugin-collector-cpu  
+Fork https://github.com/intelsdi-x/snap-plugin-collector-cpu
 Clone repo into `$GOPATH/src/github.com/intelsdi-x/`:
 
 ```
@@ -123,30 +123,30 @@ Create a task manifest file ( see [exemplary files] (https://github.com/intelsdi
     "workflow": {
         "collect": {
             "metrics": {
-	"/intel/procfs/cpu/*/user_jiffies" : {},
-	"/intel/procfs/cpu/*/nice_jiffies" : {},
-	"/intel/procfs/cpu/*/system_jiffies" : {},
-	"/intel/procfs/cpu/*/idle_jiffies" : {},
-	"/intel/procfs/cpu/*/iowait_jiffies" : {},
-	"/intel/procfs/cpu/*/irq_jiffies" : {},
-	"/intel/procfs/cpu/*/softirq_jiffies" : {},
-	"/intel/procfs/cpu/*/steal_jiffies" : {},
-	"/intel/procfs/cpu/*/guest_jiffies" : {},
-	"/intel/procfs/cpu/*/guest_nice_jiffies" : {},
-	"/intel/procfs/cpu/*/active_jiffies" : {},
-	"/intel/procfs/cpu/*/utilization_jiffies" : {},
-	"/intel/procfs/cpu/*/user_percentage" : {},
-	"/intel/procfs/cpu/*/nice_percentage" : {},
-	"/intel/procfs/cpu/*/system_percentage" : {},
-	"/intel/procfs/cpu/*/idle_percentage" : {},
-	"/intel/procfs/cpu/*/iowait_percentage" : {},
-	"/intel/procfs/cpu/*/irq_percentage" : {},
-	"/intel/procfs/cpu/*/softirq_percentage" : {},
-	"/intel/procfs/cpu/*/steal_percentage" : {},
-	"/intel/procfs/cpu/*/guest_percentage" : {},
-	"/intel/procfs/cpu/*/guest_nice_percentage" : {},
-	"/intel/procfs/cpu/*/active_percentage" : {},
-	"/intel/procfs/cpu/*/utilization_percentage" : {}
+	            "/intel/procfs/cpu/*/user_jiffies" : {},
+	            "/intel/procfs/cpu/*/nice_jiffies" : {},
+	            "/intel/procfs/cpu/*/system_jiffies" : {},
+	            "/intel/procfs/cpu/*/idle_jiffies" : {},
+	            "/intel/procfs/cpu/*/iowait_jiffies" : {},
+	            "/intel/procfs/cpu/*/irq_jiffies" : {},
+	            "/intel/procfs/cpu/*/softirq_jiffies" : {},
+	            "/intel/procfs/cpu/*/steal_jiffies" : {},
+	            "/intel/procfs/cpu/*/guest_jiffies" : {},
+	            "/intel/procfs/cpu/*/guest_nice_jiffies" : {},
+	            "/intel/procfs/cpu/*/active_jiffies" : {},
+	            "/intel/procfs/cpu/*/utilization_jiffies" : {},
+	            "/intel/procfs/cpu/*/user_percentage" : {},
+	            "/intel/procfs/cpu/*/nice_percentage" : {},
+	            "/intel/procfs/cpu/*/system_percentage" : {},
+	            "/intel/procfs/cpu/*/idle_percentage" : {},
+	            "/intel/procfs/cpu/*/iowait_percentage" : {},
+	            "/intel/procfs/cpu/*/irq_percentage" : {},
+	            "/intel/procfs/cpu/*/softirq_percentage" : {},
+	            "/intel/procfs/cpu/*/steal_percentage" : {},
+	            "/intel/procfs/cpu/*/guest_percentage" : {},
+	            "/intel/procfs/cpu/*/guest_nice_percentage" : {},
+	            "/intel/procfs/cpu/*/active_percentage" : {},
+	            "/intel/procfs/cpu/*/utilization_percentage" : {}
             },
             "process": [
                 {
@@ -154,7 +154,7 @@ Create a task manifest file ( see [exemplary files] (https://github.com/intelsdi
                     "process": null,
                     "publish": [
                         {
-                            "plugin_name": "file",
+                            "plugin_name": "mock-file",
                             "config": {
                                 "file": "/tmp/published_cpu.log"
                             }
@@ -171,24 +171,24 @@ Create a task manifest file ( see [exemplary files] (https://github.com/intelsdi
 
 Load passthru plugin for processing:
 ```
-$ $SNAP_PATH/bin/snapctl plugin load build/plugin/snap-processor-passthru
+$ $SNAP_PATH/bin/snapctl plugin load build/plugin/snap-plugin-processor-passthru
 Plugin loaded
 Name: passthru
 Version: 1
 Type: processor
 Signed: false
-Loaded Time: Fri, 20 Nov 2015 11:44:03 PST
+Loaded Time: Fri, 26 Aug 2016 12:13:18 CEST
 ```
 
 Load file plugin for publishing:
 ```
-$ $SNAP_PATH/bin/snapctl plugin load build/plugin/snap-publisher-file
+$ $SNAP_PATH/bin/snapctl plugin load build/plugin/snap-plugin-publisher-mock-file
 Plugin loaded
-Name: file
+Name: mock-file
 Version: 3
 Type: publisher
 Signed: false
-Loaded Time: Fri, 20 Nov 2015 11:41:39 PST
+Loaded Time: Fri, 26 Aug 2016 12:13:43 CEST
 ```
 
 Create a task:

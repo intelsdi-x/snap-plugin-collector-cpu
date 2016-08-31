@@ -48,7 +48,7 @@ const (
 	pluginName = "cpu"
 
 	// version of cpu plugin
-	version = 5
+	version = 6
 
 	//pluginType type of plugin
 	pluginType = plugin.CollectorPluginType
@@ -388,12 +388,12 @@ func getStats(path string, stats map[string]map[string]interface{}, prevMetricsS
 					}
 
 					if percVal := float64(100 * (currVal - prevVal) / diffSum); percVal < 0 {
-						fmt.Fprintf(os.Stderr, "Percentage value of %v could not be calculated due to invalid data reported by /proc/stat", getNamespaceMetricPart(metricName, percentageRepresentationType))
+						fmt.Fprintf(os.Stderr, "Percentage value of %v could not be calculated due to invalid data reported by /proc/stat\n", getNamespaceMetricPart(metricName, percentageRepresentationType))
 					} else {
 						metricStats[getNamespaceMetricPart(metricName, percentageRepresentationType)] = percVal
 					}
 				} else {
-					fmt.Fprintf(os.Stderr, "Percentage value of %v could not be calculated due to invalid data reported by /proc/stat", getNamespaceMetricPart(metricName, percentageRepresentationType))
+					fmt.Fprintf(os.Stderr, "Percentage value of %v could not be calculated due to invalid data reported by /proc/stat\n", getNamespaceMetricPart(metricName, percentageRepresentationType))
 				}
 			}
 			metricStats[getNamespaceMetricPart(metricName, jiffiesRepresentationType)] = currVal

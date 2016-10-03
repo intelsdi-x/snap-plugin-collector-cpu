@@ -43,7 +43,7 @@ Build the plugin by running make within the cloned repo:
 ```
 $ make
 ```
-This builds the plugin in `/build/rootfs/`
+This builds the plugin in `/build/$GOOS/GOARCH`
 
 ### Configuration and Usage
 * Set up the [snap framework](https://github.com/intelsdi-x/snap/blob/master/README.md#getting-started)
@@ -90,6 +90,12 @@ Collected metrics have namespace in following format: `/intel/procfs/cpu/<cpu_id
 List of collected metrics in [METRICS.md](https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/METRICS.md)
 
 ### Examples
+#### Run the example
+```bash
+./examples/run-cpu-file.sh
+```
+
+#### Run the plugin manually
 Example running CPU collector plugin, passthru processor plugin, and writing data to a file using file publisher plugin.
 
 Make sure that your `$SNAP_PATH` is set, if not:
@@ -154,7 +160,7 @@ Create a task manifest file ( see [exemplary files] (https://github.com/intelsdi
                     "process": null,
                     "publish": [
                         {
-                            "plugin_name": "mock-file",
+                            "plugin_name": "file",
                             "config": {
                                 "file": "/tmp/published_cpu.log"
                             }
@@ -182,9 +188,9 @@ Loaded Time: Fri, 26 Aug 2016 12:13:18 CEST
 
 Load file plugin for publishing:
 ```
-$ $SNAP_PATH/bin/snapctl plugin load build/plugin/snap-plugin-publisher-mock-file
+$ $SNAP_PATH/bin/snapctl plugin load build/plugin/snap-plugin-publisher-file
 Plugin loaded
-Name: mock-file
+Name: file
 Version: 3
 Type: publisher
 Signed: false

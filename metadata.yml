@@ -1,0 +1,9 @@
+name: cpu
+type: collector
+maintainer: core
+license: Apache-2.0
+description: "Collects Linux cpu metrics from /proc/stat."
+badge:
+  - "[![Build Status](https://travis-ci.org/intelsdi-x/snap-plugin-collector-cpu.svg?branch=master)](https://travis-ci.org/intelsdi-x/snap-plugin-collector-cpu)"
+ci:
+  - https://travis-ci.org/intelsdi-x/snap-plugin-collector-cpu

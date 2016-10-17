@@ -4,7 +4,7 @@ This plugin collects metrics from /proc/stat kernel information about the amount
 measured in units of USER_HZ (1/100ths of a second on most architectures, use
 sysconf(_SC_CLK_TCK) to obtain the right value), that the system spent in various states. 
 
-It's used in the [snap framework](http://github.com:intelsdi-x/snap).
+It's used in the [Snap framework](http://github.com:intelsdi-x/snap).
 
 1. [Getting Started](#getting-started)
   * [System Requirements](#system-requirements)
@@ -29,7 +29,7 @@ All OSs currently supported by plugin:
 * Linux/amd64
 
 ### Installation
-You can get the pre-built binaries for your OS and architecture at snap's [GitHub Releases](https://github.com/intelsdi-x/snap/releases) page. Download the plugins package from the latest release, unzip and store in a path you want `snapd` to access.
+You can get the pre-built binaries for your OS and architecture at Snap's [GitHub Releases](https://github.com/intelsdi-x/snap/releases) page. Download the plugins package from the latest release, unzip and store in a path you want `snapd` to access.
 
 ### To build the plugin binary:
 Fork https://github.com/intelsdi-x/snap-plugin-collector-cpu
@@ -43,10 +43,10 @@ Build the plugin by running make within the cloned repo:
 ```
 $ make
 ```
-This builds the plugin in `/build/$GOOS/GOARCH`
+This builds the plugin in `/build/$GOOS/$GOARCH`
 
 ### Configuration and Usage
-* Set up the [snap framework](https://github.com/intelsdi-x/snap/blob/master/README.md#getting-started)
+* Set up the [Snap framework](https://github.com/intelsdi-x/snap/blob/master/README.md#getting-started)
 * If /proc resides in a different directory, say for example by mounting host /proc inside a container at /hostproc, a proc_path configuration item can be added to snapd global config or as part of the task manifest for the metrics to be collected.
 
 As part of snapd global config
@@ -96,110 +96,104 @@ List of collected metrics in [METRICS.md](https://github.com/intelsdi-x/snap-plu
 ```
 
 #### Run the plugin manually
-Example running CPU collector plugin, passthru processor plugin, and writing data to a file using file publisher plugin.
+Example running CPU collector plugin and writing data to a file using [file publisher plugin](https://github.com/intelsdi-x/snap-plugin-publisher-file).
 
-Make sure that your `$SNAP_PATH` is set, if not:
+Make sure that your `$SNAP_PATH` is set, e.g.:
 ```
-$ export SNAP_PATH=<snapDirectoryPath>/build
+$ export SNAP_PATH=<snapDirectoryPath>/build/linux/x86_64
 ```
 Other paths to files should be set according to your configuration, using a file you should indicate where it is located.
 
-In one terminal window, open the snap daemon (in this case with logging set to 1 and trust disabled):
+In one terminal window, open the Snap daemon (in this case with logging set to 1 and trust disabled):
 ```
-$ $SNAP_PATH/bin/snapd -l 1 -t 0
+$ $SNAP_PATH/snapd -l 1 -t 0
 ```
+
 In another terminal window:
+
+
 Load snap-plugin-collector-cpu plugin:
 ```
-$ $SNAP_PATH/bin/snapctl plugin load snap-plugin-collector-cpu
+$ $SNAP_PATH/snapctl plugin load snap-plugin-collector-cpu
 ```
 See available metrics for your system:
 ```
-$ $SNAP_PATH/bin/snapctl metric list
-```
-Create a task manifest file ( see [exemplary files] (https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/examples/task/)):
-    
-```json
-{
-    "version": 1,
-    "schedule": {
-        "type": "simple",
-        "interval": "1s"
-    },
-    "workflow": {
-        "collect": {
-            "metrics": {
-	            "/intel/procfs/cpu/*/user_jiffies" : {},
-	            "/intel/procfs/cpu/*/nice_jiffies" : {},
-	            "/intel/procfs/cpu/*/system_jiffies" : {},
-	            "/intel/procfs/cpu/*/idle_jiffies" : {},
-	            "/intel/procfs/cpu/*/iowait_jiffies" : {},
-	            "/intel/procfs/cpu/*/irq_jiffies" : {},
-	            "/intel/procfs/cpu/*/softirq_jiffies" : {},
-	            "/intel/procfs/cpu/*/steal_jiffies" : {},
-	            "/intel/procfs/cpu/*/guest_jiffies" : {},
-	            "/intel/procfs/cpu/*/guest_nice_jiffies" : {},
-	            "/intel/procfs/cpu/*/active_jiffies" : {},
-	            "/intel/procfs/cpu/*/utilization_jiffies" : {},
-	            "/intel/procfs/cpu/*/user_percentage" : {},
-	            "/intel/procfs/cpu/*/nice_percentage" : {},
-	            "/intel/procfs/cpu/*/system_percentage" : {},
-	            "/intel/procfs/cpu/*/idle_percentage" : {},
-	            "/intel/procfs/cpu/*/iowait_percentage" : {},
-	            "/intel/procfs/cpu/*/irq_percentage" : {},
-	            "/intel/procfs/cpu/*/softirq_percentage" : {},
-	            "/intel/procfs/cpu/*/steal_percentage" : {},
-	            "/intel/procfs/cpu/*/guest_percentage" : {},
-	            "/intel/procfs/cpu/*/guest_nice_percentage" : {},
-	            "/intel/procfs/cpu/*/active_percentage" : {},
-	            "/intel/procfs/cpu/*/utilization_percentage" : {}
-            },
-            "process": [
-                {
-                    "plugin_name": "passthru",
-                    "process": null,
-                    "publish": [
-                        {
-                            "plugin_name": "file",
-                            "config": {
-                                "file": "/tmp/published_cpu.log"
-                            }
-                        }
-                    ],
-                    "config": null
-                }
-            ],
-            "publish": null
-        }
-    }
-}
+$ $SNAP_PATH/snapctl metric list
 ```
 
-Load passthru plugin for processing:
+Get file plugin for publishing, appropriate for Linux or Darwin:
 ```
-$ $SNAP_PATH/bin/snapctl plugin load build/plugin/snap-plugin-processor-passthru
-Plugin loaded
-Name: passthru
-Version: 1
-Type: processor
-Signed: false
-Loaded Time: Fri, 26 Aug 2016 12:13:18 CEST
+$ wget  http://snap.ci.snap-telemetry.io/plugins/snap-plugin-publisher-file/latest/linux/x86_64/snap-plugin-publisher-file
+```
+or
+```
+$ wget  http://snap.ci.snap-telemetry.io/plugins/snap-plugin-publisher-file/latest/darwin/x86_64/snap-plugin-publisher-file
 ```
 
 Load file plugin for publishing:
 ```
-$ $SNAP_PATH/bin/snapctl plugin load build/plugin/snap-plugin-publisher-file
-Plugin loaded
-Name: file
-Version: 3
-Type: publisher
-Signed: false
-Loaded Time: Fri, 26 Aug 2016 12:13:43 CEST
+$ $SNAP_PATH/snapctl plugin load snap-plugin-publisher-file
 ```
+
+Create a task manifest file (see [exemplary files] (https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/examples/tasks/)):
+    
+```json
+{
+  "version": 1,
+  "schedule": {
+    "type": "simple",
+    "interval": "5s"
+  },
+  "workflow": {
+    "collect": {
+      "metrics": {
+        "/intel/procfs/cpu/*/active_jiffies": {},
+        "/intel/procfs/cpu/*/active_percentage": {},
+        "/intel/procfs/cpu/*/guest_jiffies": {},
+        "/intel/procfs/cpu/*/guest_nice_jiffies": {},
+        "/intel/procfs/cpu/*/guest_nice_percentage": {},
+        "/intel/procfs/cpu/*/guest_percentage": {},
+        "/intel/procfs/cpu/*/idle_jiffies": {},
+        "/intel/procfs/cpu/*/idle_percentage": {},
+        "/intel/procfs/cpu/*/iowait_jiffies": {},
+        "/intel/procfs/cpu/*/iowait_percentage": {},
+        "/intel/procfs/cpu/*/irq_jiffies": {},
+        "/intel/procfs/cpu/*/irq_percentage": {},
+        "/intel/procfs/cpu/*/nice_jiffies": {},
+        "/intel/procfs/cpu/*/nice_percentage": {},
+        "/intel/procfs/cpu/*/softirq_jiffies": {},
+        "/intel/procfs/cpu/*/softirq_percentage": {},
+        "/intel/procfs/cpu/*/steal_jiffies": {},
+        "/intel/procfs/cpu/*/steal_percentage": {},
+        "/intel/procfs/cpu/*/system_jiffies": {},
+        "/intel/procfs/cpu/*/system_percentage": {},
+        "/intel/procfs/cpu/*/user_jiffies": {},
+        "/intel/procfs/cpu/*/user_percentage": {},
+        "/intel/procfs/cpu/*/utilization_jiffies": {},
+        "/intel/procfs/cpu/*/utilization_percentage": {}
+      },
+      "config": {
+        "/intel/procfs/cpu": {
+          "proc_path": "/proc"
+        }
+      },
+      "publish": [
+        {
+          "plugin_name": "file",
+          "config": {
+            "file": "/tmp/published_cpu.log"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
 
 Create a task:
 ```
-$ $SNAP_PATH/bin/snapctl task create -t examples/tasks/cpu-file.json
+$ $SNAP_PATH/snapctl task create -t cpu-file.json
 Using task manifest to create task
 Task created
 ID: 02dd7ff4-8106-47e9-8b86-70067cd0a850
@@ -209,7 +203,7 @@ State: Running
 
 Stop previously created task:
 ```
-$ $SNAP_PATH/bin/snapctl task stop 02dd7ff4-8106-47e9-8b86-70067cd0a850
+$ $SNAP_PATH/snapctl task stop 02dd7ff4-8106-47e9-8b86-70067cd0a850
 Task stopped:
 ID: 02dd7ff4-8106-47e9-8b86-70067cd0a850
 ```
@@ -220,9 +214,8 @@ There isn't a current roadmap for this plugin, but it is in active development. 
 If you have a feature request, please add it as an [issue](https://github.com/intelsdi-x/snap-plugin-collector-cpu/issues).
 
 ## Community Support
-This repository is one of **many** plugins in **snap**, a powerful telemetry framework. The full project is at http://github.com:intelsdi-x/snap.
-To reach out on other use cases, visit:
-* [snap Gitter channel](https://gitter.im/intelsdi-x/snap)
+This repository is one of **many** plugins in **Snap**, a powerful telemetry framework. The full project is at http://github.com:intelsdi-x/snap.
+To reach out on other use cases, visit [Slack](http://slack.snap-telemetry.io).
 
 ## Contributing
 We love contributions!
@@ -232,7 +225,7 @@ There's more than one way to give back, from examples to blogs to code updates. 
 And **thank you!** Your contribution, through code and participation, is incredibly important to us.
 
 ## License
-[snap](http://github.com:intelsdi-x/snap), along with this plugin, is an Open Source software released under the Apache 2.0 [License](LICENSE).
+[Snap](http://github.com:intelsdi-x/snap), along with this plugin, is an Open Source software released under the Apache 2.0 [License](LICENSE).
 
 ## Acknowledgements
 * Author: [Katarzyna Zabrocka](https://github.com/katarzyna-z)

@@ -1,0 +1,15 @@
+package: github.com/intelsdi-x/snap-plugin-collector-cpu
+import:
+- package: github.com/intelsdi-x/snap
+  subpackages:
+  - control/plugin
+  - control/plugin/cpolicy
+  - core
+  - core/ctypes
+testImport:
+- package: github.com/smartystreets/goconvey
+  subpackages:
+  - convey
+- package: github.com/stretchr/testify
+  subpackages:
+  - suite

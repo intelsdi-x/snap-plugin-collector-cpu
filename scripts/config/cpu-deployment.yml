@@ -12,7 +12,7 @@ spec:
         spec:
             containers:
             - name: main
-              image: intelsdi/snap:alpine
+              image: intelsdi/snap:alpine_test
               env:
                 - name: SNAP_VERSION
                   value: "latest"

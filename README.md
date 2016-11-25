@@ -29,7 +29,7 @@ All OSs currently supported by plugin:
 * Linux/amd64
 
 ### Installation
-You can get the pre-built binaries for your OS and architecture at Snap's [GitHub Releases](https://github.com/intelsdi-x/snap/releases) page. Download the plugins package from the latest release, unzip and store in a path you want `snapd` to access.
+You can get the pre-built binaries for your OS and architecture at Snap's [GitHub Releases](https://github.com/intelsdi-x/snap/releases) page. Download the plugins package from the latest release, unzip and store in a path you want `snapteld` to access.
 
 ### To build the plugin binary:
 Fork https://github.com/intelsdi-x/snap-plugin-collector-cpu
@@ -47,9 +47,9 @@ This builds the plugin in `/build/$GOOS/$GOARCH`
 
 ### Configuration and Usage
 * Set up the [Snap framework](https://github.com/intelsdi-x/snap/blob/master/README.md#getting-started)
-* If /proc resides in a different directory, say for example by mounting host /proc inside a container at /hostproc, a proc_path configuration item can be added to snapd global config or as part of the task manifest for the metrics to be collected.
+* If /proc resides in a different directory, say for example by mounting host /proc inside a container at /hostproc, a proc_path configuration item can be added to snapteld global config or as part of the task manifest for the metrics to be collected.
 
-As part of snapd global config
+As part of snapteld global config
 
 ```yaml
 ---
@@ -106,7 +106,7 @@ Other paths to files should be set according to your configuration, using a file
 
 In one terminal window, open the Snap daemon (in this case with logging set to 1 and trust disabled):
 ```
-$ $SNAP_PATH/snapd -l 1 -t 0
+$ $SNAP_PATH/snapteld -l 1 -t 0
 ```
 
 In another terminal window:
@@ -114,11 +114,11 @@ In another terminal window:
 
 Load snap-plugin-collector-cpu plugin:
 ```
-$ $SNAP_PATH/snapctl plugin load snap-plugin-collector-cpu
+$ $SNAP_PATH/snaptel plugin load snap-plugin-collector-cpu
 ```
 See available metrics for your system:
 ```
-$ $SNAP_PATH/snapctl metric list
+$ $SNAP_PATH/snaptel metric list
 ```
 
 Get file plugin for publishing, appropriate for Linux or Darwin:
@@ -132,7 +132,7 @@ $ wget  http://snap.ci.snap-telemetry.io/plugins/snap-plugin-publisher-file/late
 
 Load file plugin for publishing:
 ```
-$ $SNAP_PATH/snapctl plugin load snap-plugin-publisher-file
+$ $SNAP_PATH/snaptel plugin load snap-plugin-publisher-file
 ```
 
 Create a task manifest file (see [exemplary files] (https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/examples/tasks/)):
@@ -193,7 +193,7 @@ Create a task manifest file (see [exemplary files] (https://github.com/intelsdi-
 
 Create a task:
 ```
-$ $SNAP_PATH/snapctl task create -t cpu-file.json
+$ $SNAP_PATH/snaptel task create -t cpu-file.json
 Using task manifest to create task
 Task created
 ID: 02dd7ff4-8106-47e9-8b86-70067cd0a850
@@ -203,7 +203,7 @@ State: Running
 
 Stop previously created task:
 ```
-$ $SNAP_PATH/snapctl task stop 02dd7ff4-8106-47e9-8b86-70067cd0a850
+$ $SNAP_PATH/snaptel task stop 02dd7ff4-8106-47e9-8b86-70067cd0a850
 Task stopped:
 ID: 02dd7ff4-8106-47e9-8b86-70067cd0a850
 ```

@@ -98,15 +98,11 @@ List of collected metrics in [METRICS.md](https://github.com/intelsdi-x/snap-plu
 #### Run the plugin manually
 Example running CPU collector plugin and writing data to a file using [file publisher plugin](https://github.com/intelsdi-x/snap-plugin-publisher-file).
 
-Make sure that your `$SNAP_PATH` is set, e.g.:
-```
-$ export SNAP_PATH=<snapDirectoryPath>/build/linux/x86_64
-```
 Other paths to files should be set according to your configuration, using a file you should indicate where it is located.
 
 In one terminal window, open the Snap daemon (in this case with logging set to 1 and trust disabled):
 ```
-$ $SNAP_PATH/snapteld -l 1 -t 0
+$ snapteld -l 1 -t 0
 ```
 
 In another terminal window:
@@ -114,11 +110,11 @@ In another terminal window:
 
 Load snap-plugin-collector-cpu plugin:
 ```
-$ $SNAP_PATH/snaptel plugin load snap-plugin-collector-cpu
+$ snaptel plugin load snap-plugin-collector-cpu
 ```
 See available metrics for your system:
 ```
-$ $SNAP_PATH/snaptel metric list
+$ snaptel metric list
 ```
 
 Get file plugin for publishing, appropriate for Linux or Darwin:
@@ -132,7 +128,7 @@ $ wget  http://snap.ci.snap-telemetry.io/plugins/snap-plugin-publisher-file/late
 
 Load file plugin for publishing:
 ```
-$ $SNAP_PATH/snaptel plugin load snap-plugin-publisher-file
+$ snaptel plugin load snap-plugin-publisher-file
 ```
 
 Create a task manifest file (see [exemplary files] (https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/examples/tasks/)):
@@ -193,7 +189,7 @@ Create a task manifest file (see [exemplary files] (https://github.com/intelsdi-
 
 Create a task:
 ```
-$ $SNAP_PATH/snaptel task create -t cpu-file.json
+$ snaptel task create -t cpu-file.json
 Using task manifest to create task
 Task created
 ID: 02dd7ff4-8106-47e9-8b86-70067cd0a850
@@ -203,7 +199,7 @@ State: Running
 
 Stop previously created task:
 ```
-$ $SNAP_PATH/snaptel task stop 02dd7ff4-8106-47e9-8b86-70067cd0a850
+$ snaptel task stop 02dd7ff4-8106-47e9-8b86-70067cd0a850
 Task stopped:
 ID: 02dd7ff4-8106-47e9-8b86-70067cd0a850
 ```

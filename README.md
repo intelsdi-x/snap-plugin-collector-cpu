@@ -210,7 +210,7 @@ There isn't a current roadmap for this plugin, but it is in active development. 
 If you have a feature request, please add it as an [issue](https://github.com/intelsdi-x/snap-plugin-collector-cpu/issues).
 
 ## Community Support
-This repository is one of **many** plugins in **Snap**, a powerful telemetry framework. The full project is at http://github.com:intelsdi-x/snap.
+This repository is one of **many** plugins in **Snap**, a powerful telemetry framework. The full project is at http://github.com/intelsdi-x/snap.
 To reach out on other use cases, visit [Slack](http://slack.snap-telemetry.io).
 
 ## Contributing

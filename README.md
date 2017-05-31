@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/intelsdi-x/snap-plugin-collector-cpu.svg?branch=master)](https://travis-ci.org/intelsdi-x/snap-plugin-collector-cpu) [![Build Status](https://ci.snap-telemetry.io/job/snap-plugin-collector-cpu-ec2-periodic/badge/icon)](https://ci.snap-telemetry.io/job/snap-plugin-collector-cpu-ec2-periodic/)
+
 # snap collector plugin - cpu
 
 This plugin collects metrics from /proc/stat kernel information about the amount of time, 

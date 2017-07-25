@@ -31,10 +31,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/intelsdi-x/snap/control/plugin"
-	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
-	"github.com/intelsdi-x/snap/core"
-	"github.com/intelsdi-x/snap/core/ctypes"
+	"github.com/intelsdi-x/snap-plugin-lib-go/v1/plugin"
 )
 
 const (
@@ -45,13 +42,10 @@ const (
 	fs = "procfs"
 
 	//pluginName namespace part
-	pluginName = "cpu"
+	Name = "cpu"
 
 	// version of cpu plugin
-	version = 6
-
-	//pluginType type of plugin
-	pluginType = plugin.CollectorPluginType
+	Version = 7
 
 	//userProcStat "user" metric from /proc/stat
 	userProcStat = "user"
@@ -105,7 +99,7 @@ const (
 	cpuStr = "cpu"
 )
 
-//Plugin cpu plugin struct which gathers plugin specific data
+// CPUCollector plugin struct which gathers plugin specific data
 
 /* stats - metrics per cpu read from file /proc/stat:
 map ["all": map["user_jiffies": x
@@ -116,10 +110,9 @@ map ["all": map["user_jiffies": x
 	      ... ]
      "1": ... ]
 */
-type Plugin struct {
+type CPUCollector struct {
 	initialized          bool
 	proc_path            string
-	host                 string
 	cpuMetricsNumber     int // number of cpu + "all" metric
 	stats                map[string]map[string]interface{}
 	prevMetricsSum       map[string]float64
@@ -127,26 +120,41 @@ type Plugin struct {
 	snapMetricsNames     []string
 }
 
-//cpuInfo source of data for metrics
+// cpuInfo source of data for metrics
 var cpuInfo = "/proc/stat"
+
+// New creates instance of interface info plugin
+func New() *CPUCollector {
+	return &CPUCollector{
+		proc_path: cpuInfo,
+	}
+}
+
+// GetConfigPolicy returns config policy
+// It returns error in case retrieval was not successful
+func (p *CPUCollector) GetConfigPolicy() (plugin.ConfigPolicy, error) {
+	policy := plugin.NewConfigPolicy()
+	policy.AddNewStringRule([]string{vendor, fs, Name}, "proc_path", false, plugin.SetDefaultString("/proc"))
+
+	return *policy, nil
+}
 
 // GetMetricTypes returns list of available metric types
 // It returns error in case retrieval was not successful
-func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, error) {
+func (p *CPUCollector) GetMetricTypes(cfg plugin.Config) ([]plugin.Metric, error) {
 	if !p.initialized {
-		if err := p.init(cfg.Table()); err != nil {
+		if err := p.init(cfg); err != nil {
 			return nil, err
 		}
 	}
-	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
-		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
+	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames); err != nil {
 		return nil, err
 	}
-	metricTypes := []plugin.MetricType{}
+	mts := []plugin.Metric{}
 
 	namespaces := []string{}
 
-	prefix := filepath.Join(vendor, fs, pluginName)
+	prefix := filepath.Join(vendor, fs, Name)
 	for cpu, stats := range p.stats {
 		for metric, _ := range stats {
 			namespaces = append(namespaces, prefix+"/"+cpu+"/"+metric)
@@ -157,42 +165,41 @@ func (p *Plugin) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, err
 	mList := make(map[string]bool)
 	for _, namespace := range namespaces {
 		namespace = strings.TrimRight(namespace, string(os.PathSeparator))
-		metricType := plugin.MetricType{
-			Namespace_: core.NewNamespace(strings.Split(namespace, string(os.PathSeparator))...)}
-		ns := metricType.Namespace()
+		mt := plugin.Metric{
+			Namespace: plugin.NewNamespace(strings.Split(namespace, string(os.PathSeparator))...)}
+		ns := mt.Namespace
 		// CPU metric (aka last element in namespace)
 		mItem := ns[len(ns)-1]
 		// Keep it if not already seen before
 		if !mList[mItem.Value] {
 			mList[mItem.Value] = true
-			metricTypes = append(metricTypes, plugin.MetricType{
-				Namespace_: core.NewNamespace(strings.Split(prefix, string(os.PathSeparator))...).
+			mts = append(mts, plugin.Metric{
+				Namespace: plugin.NewNamespace(strings.Split(prefix, string(os.PathSeparator))...).
 					AddDynamicElement("cpuID", "ID of CPU ('all' for aggregate)").
 					AddStaticElement(mItem.Value),
-				Description_: "dynamic CPU metric: " + mItem.Value,
+				Description: "dynamic CPU metric: " + mItem.Value,
 			})
 		}
 	}
 
-	return metricTypes, nil
+	return mts, nil
 }
 
 // CollectMetrics returns list of requested metric values
 // It returns error in case retrieval was not successful
-func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.MetricType, error) {
-	metrics := []plugin.MetricType{}
+func (p *CPUCollector) CollectMetrics(mts []plugin.Metric) ([]plugin.Metric, error) {
+	metrics := []plugin.Metric{}
 	if !p.initialized {
-		if err := p.init(metricTypes[0].Config().Table()); err != nil {
+		if err := p.init(mts[0].Config); err != nil {
 			return nil, err
 		}
 	}
-	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber,
-		p.snapMetricsNames, p.procStatMetricsNames); err != nil {
+	if err := getStats(p.proc_path, p.stats, p.prevMetricsSum, p.cpuMetricsNumber, p.snapMetricsNames, p.procStatMetricsNames); err != nil {
 		return nil, err
 	}
 	ts := time.Now()
-	for _, metricType := range metricTypes {
-		ns := metricType.Namespace()
+	for _, mt := range mts {
+		ns := mt.Namespace
 		if len(ns) != maxNamespaceSize {
 			return nil, fmt.Errorf("Incorrect namespace length (len = %d)", len(ns))
 		}
@@ -200,14 +207,14 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.Metri
 			for cpuId, cpuStats := range p.stats {
 				for k, v := range cpuStats {
 					if ns[len(ns)-1].Value == k && v != nil {
-						ns1 := make([]core.NamespaceElement, len(ns))
+						ns1 := make([]plugin.NamespaceElement, len(ns))
 						copy(ns1, ns)
 						ns1[len(ns)-2].Value = cpuId
-						metric := plugin.MetricType{
-							Namespace_: ns1,
-							Data_:      v,
-							Timestamp_: ts,
-							Version_:   version,
+						metric := plugin.Metric{
+							Namespace: ns1,
+							Data:      v,
+							Timestamp: ts,
+							Version:   Version,
 						}
 						metrics = append(metrics, metric)
 					}
@@ -218,11 +225,11 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.Metri
 			if err != nil {
 				return metrics, err
 			}
-			metric := plugin.MetricType{
-				Namespace_: ns,
-				Data_:      val,
-				Timestamp_: ts,
-				Version_:   version,
+			metric := plugin.Metric{
+				Namespace: ns,
+				Data:      val,
+				Timestamp: ts,
+				Version:   Version,
 			}
 			metrics = append(metrics, metric)
 		}
@@ -230,31 +237,13 @@ func (p *Plugin) CollectMetrics(metricTypes []plugin.MetricType) ([]plugin.Metri
 	return metrics, nil
 }
 
-// GetConfigPolicy returns config policy
-// It returns error in case retrieval was not successful
-func (p *Plugin) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
-	cp := cpolicy.New()
-	rule, _ := cpolicy.NewStringRule("proc_path", false, "/proc")
-	node := cpolicy.NewPolicyNode()
-	node.Add(rule)
-	cp.Add([]string{vendor, fs, pluginName}, node)
-	return cp, nil
-}
-
-//Meta returns meta data for plugin
-func Meta() *plugin.PluginMeta {
-	return plugin.NewPluginMeta(
-		pluginName,
-		version,
-		pluginType,
-		[]string{},
-		[]string{plugin.SnapGOBContentType},
-		plugin.ConcurrencyCount(1))
-}
-
-func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
-	if procPath, ok := cfg["proc_path"]; ok {
-		p.proc_path = procPath.(ctypes.ConfigValueStr).Value + "/stat"
+func (p *CPUCollector) init(cfg plugin.Config) error {
+	if _, ok := cfg["proc_path"]; ok {
+		procPath, err := cfg.GetString("proc_path")
+		if err != nil {
+			procPath = "/proc"
+		}
+		p.proc_path = procPath + "/stat"
 	}
 	fh, err := os.Open(p.proc_path)
 	if err != nil {
@@ -268,13 +257,13 @@ func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
 		return err
 	}
 
-	//initialize metric names arrays
+	// initialize metric names arrays
 	p.procStatMetricsNames = []string{userProcStat, niceProcStat, systemProcStat, idleProcStat,
 		iowaitProcStat, irqProcStat, softirqProcStat, stealProcStat, guestProcStat, guestNiceProcStat}[0:procStatMetricsNumber]
 	snapSpecificMetricsNames := []string{activeProcStat, utilizationProcStat}
 
-	//build snapMetricsNames to support different kernels
-	//var snapMetricsNames []string
+	// build snapMetricsNames to support different kernels
+	// var snapMetricsNames []string
 	p.snapMetricsNames = append(p.snapMetricsNames, p.procStatMetricsNames...)
 	p.snapMetricsNames = append(p.snapMetricsNames, snapSpecificMetricsNames...)
 	p.stats = make(map[string]map[string]interface{})
@@ -283,22 +272,8 @@ func (p *Plugin) init(cfg map[string]ctypes.ConfigValue) error {
 	return nil
 }
 
-// New creates instance of interface info plugin
-func New() *Plugin {
-	host, err := os.Hostname()
-	if err != nil {
-		host = "localhost"
-	}
-	p := &Plugin{
-		host:      host,
-		proc_path: cpuInfo,
-	}
-	return p
-}
-
-//getStats gets metrics from /proc/stat output and calculates snap specific metrics
-func getStats(path string, stats map[string]map[string]interface{}, prevMetricsSum map[string]float64, cpuMetricsNumber int,
-	snapMetricsNames []string, procStatMetricsNames []string) (err error) {
+// getStats gets metrics from /proc/stat output and calculates snap specific metrics
+func getStats(path string, stats map[string]map[string]interface{}, prevMetricsSum map[string]float64, cpuMetricsNumber int, snapMetricsNames []string, procStatMetricsNames []string) (err error) {
 	fh, err := os.Open(path)
 	if err != nil {
 		return err
@@ -404,13 +379,13 @@ func getStats(path string, stats map[string]map[string]interface{}, prevMetricsS
 	return nil
 }
 
-//getNamespaceMetricPart builds part of namespace specific for metric and representation type
+// getNamespaceMetricPart builds part of namespace specific for metric and representation type
 func getNamespaceMetricPart(metricName string, representationType string) (s string) {
 	s = metricName + "_" + representationType
 	return s
 }
 
-//mapKeyExists checks if element with given key exists in map
+// mapKeyExists checks if element with given key exists in map
 func mapKeyExists(key string, m map[string]float64) bool {
 	var ret = false
 	if _, ok := m[key]; ok {
@@ -419,7 +394,7 @@ func mapKeyExists(key string, m map[string]float64) bool {
 	return ret
 }
 
-//strTabSum adds string data as float
+// strTabSum adds string data as float
 func strTabSum(metrics []string) (sum float64, err error) {
 	sum = 0
 	for i := range metrics {
@@ -432,7 +407,7 @@ func strTabSum(metrics []string) (sum float64, err error) {
 	return sum, err
 }
 
-//getMapFloatValueByNamespace gets value as float from map by namespace given in array of strings
+// getMapFloatValueByNamespace gets value as float from map by namespace given in array of strings
 func getMapFloatValueByNamespace(m map[string]interface{}, ns []string) (val float64, err error) {
 	var interfaceVal interface{}
 	interfaceVal, err = getMapValueByNamespace(m, ns)
@@ -447,7 +422,7 @@ func getMapFloatValueByNamespace(m map[string]interface{}, ns []string) (val flo
 	return val, err
 }
 
-//getMapValueByNamespace gets value from map by namespace given in array of strings
+// getMapValueByNamespace gets value from map by namespace given in array of strings
 func getMapValueByNamespace(m map[string]interface{}, ns []string) (val interface{}, err error) {
 	if m == nil {
 		return nil, fmt.Errorf("Invalid (nil) value of argument m")
@@ -473,7 +448,7 @@ func getMapValueByNamespace(m map[string]interface{}, ns []string) (val interfac
 	return val, err
 }
 
-//getInitialProcStatData gets number of CPUs and number of metrics available in /proc/stat output
+// getInitialProcStatData gets number of CPUs and number of metrics available in /proc/stat output
 func getInitialProcStatData(path string) (cpuMetricsNumber int, procStatMetricNumber int, err error) {
 	fh, err := os.Open(path)
 	if err != nil {
@@ -482,7 +457,7 @@ func getInitialProcStatData(path string) (cpuMetricsNumber int, procStatMetricNu
 	defer fh.Close()
 
 	scanner := bufio.NewScanner(fh)
-	//read the first line to start the loop
+	// read the first line to start the loop
 	scanErr := scanner.Scan()
 	if scanErr != true {
 		return cpuMetricsNumber, procStatMetricNumber, fmt.Errorf("Cannot read from %s", path)
@@ -493,16 +468,16 @@ func getInitialProcStatData(path string) (cpuMetricsNumber int, procStatMetricNu
 
 	cpuMetricsNumber = 0
 	for strings.Contains(procStatLine[0], cpuStr) {
-		//check line length, compare current length with length of the first line
-		//length of the first line = len(procStatMetricNumber) + CPU identifier
+		// check line length, compare current length with length of the first line
+		// length of the first line = len(procStatMetricNumber) + CPU identifier
 		if len(procStatLine) != (procStatMetricNumber + 1) {
 			return cpuMetricsNumber, procStatMetricNumber, fmt.Errorf("Incorrect %s output", path)
 		}
 		cpuMetricsNumber++
-		//read the next line to be able to check loop condition
+		// read the next line to be able to check loop condition
 		scanErr = scanner.Scan()
 		if scanErr != true {
-			break //no more lines to read
+			break // no more lines to read
 		}
 		procStatLine = strings.Fields(scanner.Text())
 	}

@@ -34,7 +34,6 @@ import (
 
 type CPUInfoSuite struct {
 	suite.Suite
-	MockCPUInfo string
 }
 
 const (
@@ -53,10 +52,11 @@ const (
 	defaultFormatCpuStatIndex = 0
 	narrowFormatCpuStatIndex  = 7
 	eightColumnCpuStatIndex   = 8
+
+	mockPath = "MockCPUInfo"
 )
 
 func (cis *CPUInfoSuite) SetupSuite() {
-	cpuInfo = cis.MockCPUInfo
 	loadMockCPUInfo(0)
 }
 
@@ -65,17 +65,19 @@ func (cis *CPUInfoSuite) TearDownSuite() {
 }
 
 func removeMockCPUInfo() {
-	os.Remove(cpuInfo)
+	os.Remove(mockPath)
 }
 
 func TestGetStatsSuite(t *testing.T) {
-	suite.Run(t, &CPUInfoSuite{MockCPUInfo: "MockCPUInfo"})
+	suite.Run(t, &CPUInfoSuite{})
 }
 
 func mockNew() *CPUCollector {
 	p := New()
+	p.proc_path = mockPath
 	emptyCfg := plugin.Config{}
-	p.init(emptyCfg)
+	err := p.init(emptyCfg)
+	So(err, ShouldBeNil)
 	So(p, ShouldNotBeNil)
 	So(p.snapMetricsNames, ShouldNotBeNil)
 	return p
@@ -129,7 +131,7 @@ func loadMockCPUInfo(dataSetNumber int) {
 	}
 
 	cpuInfoContent := []byte(content)
-	f, err := os.Create(cpuInfo)
+	f, err := os.Create(mockPath)
 	if err != nil {
 		panic(err)
 	}

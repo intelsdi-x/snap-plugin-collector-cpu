@@ -120,13 +120,13 @@ type CPUCollector struct {
 	snapMetricsNames     []string
 }
 
-// cpuInfo source of data for metrics
-var cpuInfo = "/proc/stat"
+// defaultProcPath source of data for metrics
+var defaultProcPath = "/proc"
 
 // New creates instance of interface info plugin
 func New() *CPUCollector {
 	return &CPUCollector{
-		proc_path: cpuInfo,
+		proc_path: defaultProcPath + "/stat",
 	}
 }
 
@@ -134,7 +134,7 @@ func New() *CPUCollector {
 // It returns error in case retrieval was not successful
 func (p *CPUCollector) GetConfigPolicy() (plugin.ConfigPolicy, error) {
 	policy := plugin.NewConfigPolicy()
-	policy.AddNewStringRule([]string{vendor, fs, Name}, "proc_path", false, plugin.SetDefaultString("/proc"))
+	policy.AddNewStringRule([]string{vendor, fs, Name}, "proc_path", false, plugin.SetDefaultString(defaultProcPath))
 
 	return *policy, nil
 }
@@ -238,13 +238,12 @@ func (p *CPUCollector) CollectMetrics(mts []plugin.Metric) ([]plugin.Metric, err
 }
 
 func (p *CPUCollector) init(cfg plugin.Config) error {
-	if _, ok := cfg["proc_path"]; ok {
-		procPath, err := cfg.GetString("proc_path")
-		if err != nil {
-			procPath = "/proc"
-		}
+	procPath, err := cfg.GetString("proc_path")
+	if err == nil {
+		// change default if proc_path supplied
 		p.proc_path = procPath + "/stat"
 	}
+
 	fh, err := os.Open(p.proc_path)
 	if err != nil {
 		return err

@@ -89,7 +89,7 @@ Or as part of the task manifest
 ## Documentation
 ### Collected Metrics
 Collected metrics have namespace in following format: `/intel/procfs/cpu/<cpu_identifier>/<metric_name>`.
-List of collected metrics in [METRICS.md](https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/METRICS.md)
+List of collected metrics can be found in [METRICS.md](https://github.com/intelsdi-x/snap-plugin-collector-cpu/blob/master/METRICS.md)
 
 ### Examples
 #### Run the example

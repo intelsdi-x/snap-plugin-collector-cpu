@@ -1,3 +1,12 @@
+DISCONTINUATION OF PROJECT. 
+
+This project will no longer be maintained by Intel.
+
+This project has been identified as having known security escapes.
+
+Intel has ceased development and contributions including, but not limited to, maintenance, bug fixes, new releases, or updates, to this project.  
+
+Intel no longer accepts patches to this project.
 [![Build Status](https://travis-ci.org/intelsdi-x/snap-plugin-collector-cpu.svg?branch=master)](https://travis-ci.org/intelsdi-x/snap-plugin-collector-cpu) [![Build Status](https://ci.snap-telemetry.io/job/snap-plugin-collector-cpu-ec2-periodic/badge/icon)](https://ci.snap-telemetry.io/job/snap-plugin-collector-cpu-ec2-periodic/)
 
 
